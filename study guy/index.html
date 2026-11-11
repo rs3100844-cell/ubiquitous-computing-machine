@@ -1,0 +1,2332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Study Guy - Smart CBSE Spaced Repetition Revision Workspace</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            yellow: '#FFD600',
+                            yellowLight: '#FFEA70',
+                            yellowDark: '#E5C000',
+                            black: '#111111',
+                            darkBg: '#141414',
+                            darkCard: '#1E1E1E',
+                            darkCardBorder: '#2E2E2E',
+                            lightBg: '#F8F9FA',
+                            lightCard: '#FFFFFF',
+                            success: '#22C55E',
+                            warning: '#F59E0B',
+                            danger: '#EF4444',
+                            subtext: '#6B7280'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Plus Jakarta Sans', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+        /* Custom Desktop Scrollbar */
+        ::-webkit-scrollbar {
+            width: 7px;
+            height: 7px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #CBD5E1;
+            border-radius: 9999px;
+        }
+        .dark ::-webkit-scrollbar-thumb {
+            background: #334155;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94A3B8;
+        }
+        .dark ::-webkit-scrollbar-thumb:hover {
+            background: #475569;
+        }
+        .animate-fade-in {
+            animation: fadeIn 0.22s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+        .animate-bounce-short {
+            animation: bounceShort 0.35s ease;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes bounceShort {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.04); }
+        }
+    </style>
+</head>
+<body class="bg-brand-lightBg dark:bg-brand-darkBg text-brand-black dark:text-gray-100 min-h-screen flex flex-col transition-colors duration-200 overflow-x-hidden selection:bg-brand-yellow selection:text-brand-black">
+
+    <!-- FULL APP SHELL CONTAINER (Desktop Optimized Full-Width Viewport) -->
+    <div id="app" class="w-full h-screen min-h-screen flex flex-col md:flex-row bg-brand-lightBg dark:bg-brand-darkBg text-brand-black dark:text-gray-100 relative overflow-hidden">
+
+        <!-- ONBOARDING OVERLAY -->
+        <div id="onboarding-modal" class="fixed inset-0 z-50 bg-brand-black/90 flex items-center justify-center p-4 backdrop-blur-sm hidden">
+            <div class="bg-white dark:bg-brand-darkCard w-full max-w-xl rounded-3xl p-6 md:p-8 shadow-2xl relative overflow-hidden border border-gray-100 dark:border-gray-800">
+                <!-- Decorative Top Banner -->
+                <div class="absolute top-0 left-0 right-0 h-2 bg-brand-yellow"></div>
+
+                <!-- Step 1: Welcome -->
+                <div id="onboard-step-1" class="space-y-6 text-center animate-fade-in">
+                    <div class="w-16 h-16 bg-brand-yellow rounded-2xl flex items-center justify-center mx-auto shadow-lg text-brand-black text-3xl font-extrabold">
+                        <i class="fa-solid fa-bolt"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-3xl font-extrabold tracking-tight">Study Guy</h1>
+                        <p class="text-brand-yellow text-xs font-bold uppercase tracking-wider mt-2 bg-brand-black px-3.5 py-1.5 inline-block rounded-full">
+                            Study Smart. Revise Better. Remember Longer.
+                        </p>
+                    </div>
+                    <p class="text-gray-600 dark:text-gray-300 text-sm md:text-base leading-relaxed">
+                        Your intelligent spaced-repetition revision companion tailored for CBSE Class 9 & 10 students. Master your syllabus with scientifically timed revisions.
+                    </p>
+                    <button onclick="nextOnboardingStep(2)" class="w-full py-3.5 px-6 bg-brand-yellow hover:bg-brand-yellowLight text-brand-black font-extrabold rounded-2xl shadow-md transition-all flex items-center justify-center gap-2 text-base">
+                        <span>Get Started Now</span>
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+                </div>
+
+                <!-- Step 2: Select Class -->
+                <div id="onboard-step-2" class="space-y-6 hidden animate-fade-in">
+                    <div class="text-center">
+                        <span class="text-xs font-bold text-gray-400 uppercase tracking-widest">Step 1 of 2</span>
+                        <h2 class="text-2xl font-bold mt-1">Select Your Class</h2>
+                        <p class="text-sm text-gray-500 dark:text-gray-400">Choose your academic grade to load the official CBSE syllabus.</p>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4">
+                        <button onclick="selectOnboardingClass('Class 9')" id="btn-class-9" class="p-6 rounded-2xl border-2 border-gray-200 dark:border-gray-700 hover:border-brand-yellow dark:hover:border-brand-yellow text-center transition-all bg-gray-50 dark:bg-gray-800/50 hover:bg-amber-50/50 dark:hover:bg-amber-950/20 group">
+                            <div class="w-12 h-12 bg-white dark:bg-gray-700 rounded-xl flex items-center justify-center mx-auto mb-3 shadow-sm group-hover:bg-brand-yellow group-hover:text-brand-black transition-colors font-bold text-xl">
+                                9
+                            </div>
+                            <div class="font-bold text-lg">Class 9</div>
+                            <div class="text-xs text-gray-500 mt-1">CBSE Board 2026-27</div>
+                        </button>
+                        <button onclick="selectOnboardingClass('Class 10')" id="btn-class-10" class="p-6 rounded-2xl border-2 border-brand-yellow bg-amber-50/50 dark:bg-amber-950/20 text-center transition-all group">
+                            <div class="w-12 h-12 bg-brand-yellow text-brand-black rounded-xl flex items-center justify-center mx-auto mb-3 shadow-sm font-bold text-xl">
+                                10
+                            </div>
+                            <div class="font-bold text-lg">Class 10</div>
+                            <div class="text-xs text-gray-500 mt-1">CBSE Board 2026-27</div>
+                        </button>
+                    </div>
+
+                    <div class="pt-2 flex justify-between gap-3">
+                        <button onclick="nextOnboardingStep(1)" class="px-5 py-2.5 rounded-xl border border-gray-300 dark:border-gray-700 text-sm font-semibold hover:bg-gray-100 dark:hover:bg-gray-800">
+                            Back
+                        </button>
+                        <button onclick="nextOnboardingStep(3)" class="flex-1 py-3 px-6 bg-brand-yellow hover:bg-brand-yellowLight text-brand-black font-bold rounded-xl shadow-md transition-all text-center">
+                            Next: Select Subjects
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Step 3: Select Subjects & Import CSV -->
+                <div id="onboard-step-3" class="space-y-6 hidden animate-fade-in">
+                    <div class="text-center">
+                        <span class="text-xs font-bold text-gray-400 uppercase tracking-widest">Step 2 of 2</span>
+                        <h2 class="text-2xl font-bold mt-1">Configure Syllabus</h2>
+                        <p class="text-sm text-gray-500 dark:text-gray-400">Select subjects to include or import custom syllabus CSV.</p>
+                    </div>
+
+                    <div id="onboarding-subjects-list" class="grid grid-cols-2 gap-3 max-h-52 overflow-y-auto p-1">
+                        <!-- Subjects toggles injected dynamically -->
+                    </div>
+
+                    <!-- Optional CSV upload -->
+                    <div class="border-t border-dashed border-gray-300 dark:border-gray-700 pt-4">
+                        <label class="block text-xs font-semibold text-gray-500 dark:text-gray-400 mb-2">Or Upload Custom Syllabus CSV (Optional)</label>
+                        <input type="file" id="onboard-csv-input" accept=".csv" class="block w-full text-xs text-gray-500 file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-gray-100 dark:file:bg-gray-800 file:text-gray-700 dark:file:text-gray-300 hover:file:bg-brand-yellow hover:file:text-brand-black transition-colors cursor-pointer" onchange="handleCSVImport(event)">
+                        <p class="text-[10px] text-gray-400 mt-1">CSV Format: <code class="bg-gray-100 dark:bg-gray-800 px-1 py-0.5 rounded">class,subject,chapter_number,chapter_name</code></p>
+                    </div>
+
+                    <div class="pt-2 flex justify-between gap-3">
+                        <button onclick="nextOnboardingStep(2)" class="px-5 py-2.5 rounded-xl border border-gray-300 dark:border-gray-700 text-sm font-semibold hover:bg-gray-100 dark:hover:bg-gray-800">
+                            Back
+                        </button>
+                        <button onclick="finishOnboarding()" class="flex-1 py-3 px-6 bg-brand-yellow hover:bg-brand-yellowLight text-brand-black font-bold rounded-xl shadow-md transition-all text-center">
+                            Launch My Revision Space 🚀
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SIDEBAR NAVIGATION (Desktop Fixed Left Rail) -->
+        <aside class="hidden md:flex flex-col w-64 lg:w-72 bg-brand-black text-white h-screen p-5 sticky top-0 flex-shrink-0 justify-between z-30 shadow-2xl border-r border-gray-800/80 select-none overflow-y-auto">
+            <div class="space-y-6">
+                <!-- App Logo & Brand -->
+                <div class="flex items-center gap-3 px-2">
+                    <div class="w-10 h-10 bg-brand-yellow rounded-xl flex items-center justify-center text-brand-black font-extrabold text-xl shadow-md">
+                        <i class="fa-solid fa-bolt"></i>
+                    </div>
+                    <div>
+                        <h1 class="font-extrabold text-lg leading-tight tracking-wide text-white">Study Guy</h1>
+                        <span id="sidebar-class-badge" class="text-[10px] text-brand-yellow bg-white/10 px-2.5 py-0.5 rounded-full font-semibold inline-block mt-0.5">Class 10 · CBSE</span>
+                    </div>
+                </div>
+
+                <!-- Navigation Links -->
+                <nav class="space-y-1.5 pt-2">
+                    <button onclick="switchTab('dashboard')" id="nav-dashboard" class="nav-item w-full flex items-center justify-between px-4 py-3 rounded-xl font-semibold text-sm transition-all text-brand-yellow bg-white/10 group">
+                        <div class="flex items-center gap-3">
+                            <i class="fa-solid fa-house w-5 text-center text-base"></i>
+                            <span>Dashboard</span>
+                        </div>
+                        <span class="text-[10px] text-gray-500 group-hover:text-gray-300 font-mono bg-white/5 px-1.5 py-0.5 rounded">1</span>
+                    </button>
+                    <button onclick="switchTab('subjects')" id="nav-subjects" class="nav-item w-full flex items-center justify-between px-4 py-3 rounded-xl font-semibold text-sm text-gray-400 hover:text-white hover:bg-white/5 transition-all group">
+                        <div class="flex items-center gap-3">
+                            <i class="fa-solid fa-book-open w-5 text-center text-base"></i>
+                            <span>Subjects & Chapters</span>
+                        </div>
+                        <span class="text-[10px] text-gray-500 group-hover:text-gray-300 font-mono bg-white/5 px-1.5 py-0.5 rounded">2</span>
+                    </button>
+                    <button onclick="switchTab('calendar')" id="nav-calendar" class="nav-item w-full flex items-center justify-between px-4 py-3 rounded-xl font-semibold text-sm text-gray-400 hover:text-white hover:bg-white/5 transition-all group">
+                        <div class="flex items-center gap-3">
+                            <i class="fa-solid fa-calendar-days w-5 text-center text-base"></i>
+                            <span>Revision Calendar</span>
+                        </div>
+                        <span class="text-[10px] text-gray-500 group-hover:text-gray-300 font-mono bg-white/5 px-1.5 py-0.5 rounded">3</span>
+                    </button>
+                    <button onclick="switchTab('analytics')" id="nav-analytics" class="nav-item w-full flex items-center justify-between px-4 py-3 rounded-xl font-semibold text-sm text-gray-400 hover:text-white hover:bg-white/5 transition-all group">
+                        <div class="flex items-center gap-3">
+                            <i class="fa-solid fa-chart-line w-5 text-center text-base"></i>
+                            <span>Analytics & Badges</span>
+                        </div>
+                        <span class="text-[10px] text-gray-500 group-hover:text-gray-300 font-mono bg-white/5 px-1.5 py-0.5 rounded">4</span>
+                    </button>
+                    <button onclick="switchTab('settings')" id="nav-settings" class="nav-item w-full flex items-center justify-between px-4 py-3 rounded-xl font-semibold text-sm text-gray-400 hover:text-white hover:bg-white/5 transition-all group">
+                        <div class="flex items-center gap-3">
+                            <i class="fa-solid fa-sliders w-5 text-center text-base"></i>
+                            <span>Settings & Data</span>
+                        </div>
+                        <span class="text-[10px] text-gray-500 group-hover:text-gray-300 font-mono bg-white/5 px-1.5 py-0.5 rounded">5</span>
+                    </button>
+                </nav>
+
+                <!-- Quick Study Prompt / Spaced Repetition Info -->
+                <div class="p-3.5 bg-white/5 rounded-2xl border border-white/5 space-y-2">
+                    <div class="flex items-center gap-2 text-brand-yellow text-xs font-bold">
+                        <i class="fa-solid fa-lightbulb"></i>
+                        <span>Spaced Repetition Tip</span>
+                    </div>
+                    <p class="text-[11px] text-gray-400 leading-relaxed">
+                        Revising on Day 1, 3, 7, 14 & 30 turns short-term study into permanent recall for CBSE board exams.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Sidebar Footer Stats -->
+            <div class="space-y-3 pt-4 border-t border-gray-800">
+                <div class="bg-gray-900/90 rounded-2xl p-4 border border-gray-800/80 space-y-3">
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs text-gray-400 font-medium">Study Streak</span>
+                        <span class="text-xs bg-amber-400/20 text-brand-yellow font-bold px-2.5 py-1 rounded-full flex items-center gap-1.5">
+                            <i class="fa-solid fa-fire text-amber-400"></i> <span id="sidebar-streak-val">0 Days</span>
+                        </span>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs text-gray-400 font-medium">XP Score</span>
+                        <span id="sidebar-xp-val" class="text-xs font-bold text-white bg-white/10 px-2.5 py-0.5 rounded-full">0 XP</span>
+                    </div>
+                </div>
+                <div class="flex items-center justify-between px-2 text-[11px] text-gray-500">
+                    <span>CBSE 2026-27</span>
+                    <span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-emerald-500 inline-block animate-pulse"></span> Active</span>
+                </div>
+            </div>
+        </aside>
+
+        <!-- MAIN VIEWPORT WRAPPER (Top Header + Scrolling Canvas) -->
+        <div class="flex-1 flex flex-col min-w-0 h-screen overflow-hidden">
+
+            <!-- DESKTOP TOP HEADER BAR -->
+            <header class="hidden md:flex items-center justify-between px-6 lg:px-8 py-3.5 bg-white/90 dark:bg-brand-darkCard/90 backdrop-blur-md border-b border-gray-200/80 dark:border-gray-800/80 z-20 flex-shrink-0">
+                <div class="flex items-center gap-4">
+                    <div>
+                        <h2 id="desktop-page-title" class="text-lg font-extrabold tracking-tight">Dashboard Overview</h2>
+                        <p id="desktop-date-str" class="text-xs text-brand-subtext font-medium flex items-center gap-1.5">
+                            <i class="fa-regular fa-calendar text-brand-yellow"></i> <span>Today</span>
+                        </p>
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-3">
+                    <!-- Quick Search / Jump Input -->
+                    <div class="relative w-64 lg:w-72">
+                        <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-2.5 text-gray-400 text-xs"></i>
+                        <input type="text" id="global-search-input" oninput="handleGlobalSearch(this.value)" placeholder="Search chapters... (Press /)" class="w-full pl-9 pr-10 py-2 rounded-xl bg-gray-100 dark:bg-gray-800 text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-brand-yellow border border-transparent focus:border-brand-yellow text-gray-800 dark:text-gray-100 transition-all">
+                        <span class="absolute right-2.5 top-2 text-[10px] font-bold text-gray-400 bg-white dark:bg-gray-700 px-1.5 py-0.5 rounded border border-gray-200 dark:border-gray-600">/</span>
+                    </div>
+
+                    <!-- Quick Class Switcher Dropdown -->
+                    <select id="header-class-selector" onchange="quickSwitchClass(this.value)" class="px-3 py-2 rounded-xl bg-gray-100 dark:bg-gray-800 text-xs font-bold border border-transparent hover:border-gray-300 dark:hover:border-gray-700 cursor-pointer focus:outline-none text-brand-black dark:text-white transition-all">
+                        <option value="Class 10">Class 10 CBSE</option>
+                        <option value="Class 9">Class 9 CBSE</option>
+                    </select>
+
+                    <!-- Sound Toggle -->
+                    <button onclick="quickToggleSound()" id="desktop-sound-btn" class="p-2.5 rounded-xl bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-300 transition-colors" title="Toggle Sound Feedback">
+                        <i class="fa-solid fa-volume-high" id="desktop-sound-icon"></i>
+                    </button>
+
+                    <!-- Dark Mode Toggle -->
+                    <button onclick="toggleDarkMode()" class="p-2.5 rounded-xl bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-300 transition-colors" title="Toggle Theme">
+                        <i class="fa-solid fa-moon dark:hidden"></i>
+                        <i class="fa-solid fa-sun hidden dark:inline text-brand-yellow"></i>
+                    </button>
+
+                    <!-- Add Chapter Primary Action -->
+                    <button onclick="openAddChapterModal()" class="px-4 py-2 bg-brand-yellow hover:bg-brand-yellowLight text-brand-black font-extrabold text-xs rounded-xl shadow-sm flex items-center gap-2 transition-all">
+                        <i class="fa-solid fa-plus"></i>
+                        <span>Add Chapter</span>
+                    </button>
+                </div>
+            </header>
+
+            <!-- MAIN SCROLLABLE CONTENT CANVAS -->
+            <main class="flex-1 p-4 md:p-6 lg:p-8 pb-24 md:pb-12 overflow-y-auto">
+                <div class="max-w-[1550px] w-full mx-auto space-y-6">
+
+                    <!-- MOBILE HEADER (Only shown on mobile devices) -->
+                    <header class="flex md:hidden items-center justify-between mb-4 pb-3 border-b border-gray-200 dark:border-gray-800">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 bg-brand-yellow rounded-lg flex items-center justify-center text-brand-black font-extrabold text-base">
+                                <i class="fa-solid fa-bolt"></i>
+                            </div>
+                            <div>
+                                <h1 class="font-extrabold text-base leading-none">Study Guy</h1>
+                                <span id="mobile-class-badge" class="text-[10px] text-gray-500 font-semibold">Class 10 · CBSE</span>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="bg-amber-100 dark:bg-amber-950/50 text-amber-700 dark:text-amber-300 text-xs font-bold px-2.5 py-1 rounded-full flex items-center gap-1">
+                                <i class="fa-solid fa-fire text-amber-500"></i> <span id="mobile-streak-val">0d</span>
+                            </span>
+                            <button onclick="toggleDarkMode()" class="p-2 rounded-xl bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300">
+                                <i class="fa-solid fa-moon dark:hidden"></i>
+                                <i class="fa-solid fa-sun hidden dark:inline"></i>
+                            </button>
+                        </div>
+                    </header>
+
+                    <!-- TAB 1: DASHBOARD -->
+                    <section id="tab-dashboard" class="tab-content space-y-6 animate-fade-in">
+
+                        <!-- Hero Banner -->
+                        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-6 bg-gradient-to-r from-brand-black via-gray-900 to-brand-black text-white p-6 md:p-8 rounded-3xl shadow-xl relative overflow-hidden border border-gray-800/80">
+                            <div class="space-y-2 relative z-10 max-w-xl">
+                                <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 text-brand-yellow text-xs font-bold backdrop-blur-sm">
+                                    <i class="fa-solid fa-sparkles"></i> CBSE Smart Spaced Repetition
+                                </div>
+                                <h2 id="dashboard-greeting" class="text-2xl md:text-3xl lg:text-4xl font-extrabold tracking-tight">Good morning, Student! 👋</h2>
+                                <p class="text-gray-300 text-sm md:text-base leading-relaxed">
+                                    Consistency is the key to CBSE excellence. Complete today's planned revisions to lock concepts in long-term memory.
+                                </p>
+                            </div>
+
+                            <div class="flex flex-wrap items-center gap-3 relative z-10">
+                                <span id="dashboard-class-tag" class="bg-brand-yellow text-brand-black px-4 py-2 rounded-xl font-extrabold text-xs tracking-wider uppercase shadow-md flex items-center gap-2">
+                                    <i class="fa-solid fa-graduation-cap"></i> Class 10 · CBSE
+                                </span>
+                                <button onclick="switchTab('subjects')" class="px-4 py-2 bg-white/10 hover:bg-white/20 text-white rounded-xl font-bold text-xs transition-colors flex items-center gap-2">
+                                    <i class="fa-solid fa-book-open"></i> Browse Syllabus
+                                </button>
+                                <button onclick="switchTab('settings')" class="hidden md:flex p-2.5 bg-white/10 hover:bg-white/20 rounded-xl text-white transition-colors" title="Settings">
+                                    <i class="fa-solid fa-gear"></i>
+                                </button>
+                            </div>
+                            <!-- Subtle background logo motif -->
+                            <i class="fa-solid fa-bolt text-[180px] text-white/[0.03] absolute -right-6 -bottom-12 pointer-events-none"></i>
+                        </div>
+
+                        <!-- Progress Overview (4 Stat KPI Cards) -->
+                        <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-5">
+                            <div class="bg-white dark:bg-brand-darkCard p-5 rounded-3xl border border-gray-100 dark:border-gray-800 shadow-sm flex items-center gap-4 hover:border-gray-300 dark:hover:border-gray-700 transition-all">
+                                <div class="w-12 h-12 rounded-2xl bg-emerald-100 dark:bg-emerald-950/60 text-brand-success flex items-center justify-center text-xl font-bold flex-shrink-0">
+                                    <i class="fa-solid fa-circle-check"></i>
+                                </div>
+                                <div class="min-w-0">
+                                    <div id="stat-completed-chapters" class="text-2xl lg:text-3xl font-extrabold leading-tight">0</div>
+                                    <div class="text-xs text-brand-subtext font-semibold truncate">Chapters Completed</div>
+                                </div>
+                            </div>
+
+                            <div class="bg-white dark:bg-brand-darkCard p-5 rounded-3xl border border-gray-100 dark:border-gray-800 shadow-sm flex items-center gap-4 hover:border-gray-300 dark:hover:border-gray-700 transition-all">
+                                <div class="w-12 h-12 rounded-2xl bg-amber-100 dark:bg-amber-950/60 text-brand-yellow flex items-center justify-center text-xl font-bold flex-shrink-0">
+                                    <i class="fa-solid fa-rotate-right"></i>
+                                </div>
+                                <div class="min-w-0">
+                                    <div id="stat-completed-revisions" class="text-2xl lg:text-3xl font-extrabold leading-tight">0</div>
+                                    <div class="text-xs text-brand-subtext font-semibold truncate">Revisions Done</div>
+                                </div>
+                            </div>
+
+                            <div class="bg-white dark:bg-brand-darkCard p-5 rounded-3xl border border-gray-100 dark:border-gray-800 shadow-sm flex items-center gap-4 hover:border-gray-300 dark:hover:border-gray-700 transition-all">
+                                <div class="w-12 h-12 rounded-2xl bg-blue-100 dark:bg-blue-950/60 text-blue-500 flex items-center justify-center text-xl font-bold flex-shrink-0">
+                                    <i class="fa-solid fa-clock"></i>
+                                </div>
+                                <div class="min-w-0">
+                                    <div id="stat-pending-revisions" class="text-2xl lg:text-3xl font-extrabold leading-tight">0</div>
+                                    <div class="text-xs text-brand-subtext font-semibold truncate">Pending Tasks</div>
+                                </div>
+                            </div>
+
+                            <div class="bg-white dark:bg-brand-darkCard p-5 rounded-3xl border border-gray-100 dark:border-gray-800 shadow-sm flex items-center gap-4 hover:border-gray-300 dark:hover:border-gray-700 transition-all">
+                                <div class="w-12 h-12 rounded-2xl bg-orange-100 dark:bg-orange-950/60 text-orange-500 flex items-center justify-center text-xl font-bold flex-shrink-0">
+                                    <i class="fa-solid fa-fire"></i>
+                                </div>
+                                <div class="min-w-0">
+                                    <div id="stat-current-streak" class="text-2xl lg:text-3xl font-extrabold leading-tight">0</div>
+                                    <div class="text-xs text-brand-subtext font-semibold truncate">Day Study Streak</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 2-COLUMN BALANCED DESKTOP GRID -->
+                        <div class="grid grid-cols-1 xl:grid-cols-3 gap-6">
+
+                            <!-- Main Column (Span 2) -->
+                            <div class="xl:col-span-2 space-y-6">
+
+                                <!-- Today's Revisions Section -->
+                                <div class="bg-white dark:bg-brand-darkCard rounded-3xl p-6 shadow-sm border border-gray-100 dark:border-gray-800 space-y-4">
+                                    <div class="flex items-center justify-between">
+                                        <div class="flex items-center gap-3">
+                                            <div class="w-3.5 h-3.5 rounded-full bg-brand-yellow animate-pulse"></div>
+                                            <h3 class="text-xl font-extrabold tracking-tight">Today's Revisions</h3>
+                                        </div>
+                                        <span id="todays-count-badge" class="text-xs font-bold bg-amber-100 dark:bg-amber-900/40 text-amber-800 dark:text-amber-300 px-3.5 py-1.5 rounded-full">
+                                            0 Tasks Scheduled
+                                        </span>
+                                    </div>
+
+                                    <div id="todays-revisions-list" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        <!-- Dynamic revision cards will load here -->
+                                    </div>
+                                </div>
+
+                                <!-- Subject Progress Grid -->
+                                <div class="space-y-4">
+                                    <div class="flex items-center justify-between">
+                                        <div>
+                                            <h3 class="text-xl font-extrabold tracking-tight">Subject Progress Matrix</h3>
+                                            <p class="text-xs text-brand-subtext font-medium">Click any subject to view and update chapters</p>
+                                        </div>
+                                        <button onclick="switchTab('subjects')" class="text-xs font-bold text-gray-500 hover:text-brand-black dark:hover:text-white flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-gray-100 dark:bg-gray-800 hover:bg-brand-yellow hover:text-brand-black transition-colors">
+                                            Manage All <i class="fa-solid fa-arrow-right text-[10px]"></i>
+                                        </button>
+                                    </div>
+
+                                    <div id="dashboard-subjects-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                        <!-- Dynamic subject cards -->
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Right Side Column (Span 1) -->
+                            <div class="space-y-6">
+
+                                <!-- Upcoming 7 Days Card -->
+                                <div class="bg-white dark:bg-brand-darkCard p-6 rounded-3xl border border-gray-100 dark:border-gray-800 shadow-sm space-y-4">
+                                    <div class="flex items-center justify-between">
+                                        <h3 class="text-base font-bold flex items-center gap-2">
+                                            <i class="fa-solid fa-calendar-week text-brand-yellow"></i>
+                                            Upcoming 7 Days
+                                        </h3>
+                                        <button onclick="switchTab('calendar')" class="px-3 py-1 bg-gray-100 dark:bg-gray-800 hover:bg-brand-yellow hover:text-brand-black text-[11px] font-bold rounded-xl transition-colors">
+                                            Calendar
+                                        </button>
+                                    </div>
+                                    <div id="upcoming-revisions-preview" class="space-y-2">
+                                        <!-- Injected dynamically -->
+                                    </div>
+                                </div>
+
+                                <!-- Spaced Repetition Protocol Explainer Card -->
+                                <div class="bg-gradient-to-br from-amber-500/10 to-yellow-500/5 dark:from-amber-950/20 dark:to-yellow-950/10 p-5 rounded-3xl border border-brand-yellow/30 space-y-3">
+                                    <div class="flex items-center gap-2 text-xs font-bold text-amber-800 dark:text-brand-yellow uppercase tracking-wider">
+                                        <i class="fa-solid fa-brain"></i> Spaced Repetition Engine
+                                    </div>
+                                    <div class="grid grid-cols-5 gap-1.5 text-center pt-1">
+                                        <div class="bg-white dark:bg-brand-darkCard p-2 rounded-xl shadow-xs border border-gray-200 dark:border-gray-800">
+                                            <div class="font-extrabold text-xs text-brand-yellow">R1</div>
+                                            <div class="text-[10px] text-gray-500">Day 1</div>
+                                        </div>
+                                        <div class="bg-white dark:bg-brand-darkCard p-2 rounded-xl shadow-xs border border-gray-200 dark:border-gray-800">
+                                            <div class="font-extrabold text-xs text-brand-yellow">R2</div>
+                                            <div class="text-[10px] text-gray-500">Day 3</div>
+                                        </div>
+                                        <div class="bg-white dark:bg-brand-darkCard p-2 rounded-xl shadow-xs border border-gray-200 dark:border-gray-800">
+                                            <div class="font-extrabold text-xs text-brand-yellow">R3</div>
+                                            <div class="text-[10px] text-gray-500">Day 7</div>
+                                        </div>
+                                        <div class="bg-white dark:bg-brand-darkCard p-2 rounded-xl shadow-xs border border-gray-200 dark:border-gray-800">
+                                            <div class="font-extrabold text-xs text-brand-yellow">R4</div>
+                                            <div class="text-[10px] text-gray-500">Day 14</div>
+                                        </div>
+                                        <div class="bg-white dark:bg-brand-darkCard p-2 rounded-xl shadow-xs border border-gray-200 dark:border-gray-800">
+                                            <div class="font-extrabold text-xs text-brand-yellow">R5</div>
+                                            <div class="text-[10px] text-gray-500">Day 30</div>
+                                        </div>
+                                    </div>
+                                    <p class="text-[11px] text-gray-500 dark:text-gray-400 leading-relaxed">
+                                        Completing each milestone dynamically calibrates subsequent intervals based on your memory recall rating (Easy, Average, Difficult).
+                                    </p>
+                                </div>
+
+                                <!-- Quick Actions -->
+                                <div class="bg-white dark:bg-brand-darkCard p-6 rounded-3xl border border-gray-100 dark:border-gray-800 shadow-sm space-y-4">
+                                    <h3 class="text-base font-bold">Quick Shortcuts</h3>
+                                    <div class="grid grid-cols-1 gap-2.5">
+                                        <button onclick="openAddChapterModal()" class="w-full py-2.5 px-4 rounded-xl bg-gray-50 dark:bg-gray-800/60 hover:bg-brand-yellow hover:text-brand-black font-semibold text-xs flex items-center justify-between transition-colors border border-gray-100 dark:border-gray-700 group">
+                                            <div class="flex items-center gap-3">
+                                                <i class="fa-solid fa-plus-circle text-brand-yellow text-sm group-hover:text-brand-black"></i>
+                                                <span>Add Custom Chapter</span>
+                                            </div>
+                                            <i class="fa-solid fa-chevron-right text-[10px] text-gray-400"></i>
+                                        </button>
+                                        <button onclick="switchTab('subjects')" class="w-full py-2.5 px-4 rounded-xl bg-gray-50 dark:bg-gray-800/60 hover:bg-brand-yellow hover:text-brand-black font-semibold text-xs flex items-center justify-between transition-colors border border-gray-100 dark:border-gray-700 group">
+                                            <div class="flex items-center gap-3">
+                                                <i class="fa-solid fa-pen-to-square text-brand-yellow text-sm group-hover:text-brand-black"></i>
+                                                <span>Update Chapter Status</span>
+                                            </div>
+                                            <i class="fa-solid fa-chevron-right text-[10px] text-gray-400"></i>
+                                        </button>
+                                        <button onclick="switchTab('calendar')" class="w-full py-2.5 px-4 rounded-xl bg-gray-50 dark:bg-gray-800/60 hover:bg-brand-yellow hover:text-brand-black font-semibold text-xs flex items-center justify-between transition-colors border border-gray-100 dark:border-gray-700 group">
+                                            <div class="flex items-center gap-3">
+                                                <i class="fa-solid fa-calendar text-brand-yellow text-sm group-hover:text-brand-black"></i>
+                                                <span>Open Full Calendar</span>
+                                            </div>
+                                            <i class="fa-solid fa-chevron-right text-[10px] text-gray-400"></i>
+                                        </button>
+                                        <button onclick="switchTab('analytics')" class="w-full py-2.5 px-4 rounded-xl bg-gray-50 dark:bg-gray-800/60 hover:bg-brand-yellow hover:text-brand-black font-semibold text-xs flex items-center justify-between transition-colors border border-gray-100 dark:border-gray-700 group">
+                                            <div class="flex items-center gap-3">
+                                                <i class="fa-solid fa-chart-pie text-brand-yellow text-sm group-hover:text-brand-black"></i>
+                                                <span>View Detailed Analytics</span>
+                                            </div>
+                                            <i class="fa-solid fa-chevron-right text-[10px] text-gray-400"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- TAB 2: SUBJECTS & CHAPTER MANAGEMENT -->
+                    <section id="tab-subjects" class="tab-content space-y-6 hidden animate-fade-in">
+                        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                            <div>
+                                <h2 class="text-2xl font-extrabold">Subjects & Chapter Tracker</h2>
+                                <p class="text-sm text-brand-subtext">Manage CBSE syllabus progress and monitor scheduled revision cycles.</p>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <button onclick="openAddSubjectModal()" class="px-4 py-2.5 bg-brand-black text-white dark:bg-gray-800 dark:text-white rounded-xl font-bold text-xs flex items-center gap-2 shadow-sm hover:opacity-90 transition-opacity">
+                                    <i class="fa-solid fa-plus"></i> Add Subject
+                                </button>
+                                <button onclick="openAddChapterModal()" class="px-4 py-2.5 bg-brand-yellow text-brand-black rounded-xl font-bold text-xs flex items-center gap-2 shadow-sm hover:bg-brand-yellowLight transition-all">
+                                    <i class="fa-solid fa-book-medical"></i> Add Chapter
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Subject Pills / Tabs with Live Counts -->
+                        <div id="subject-tab-buttons" class="flex items-center gap-2 overflow-x-auto pb-2 border-b border-gray-200 dark:border-gray-800">
+                            <!-- Dynamic Subject Tab Buttons -->
+                        </div>
+
+                        <!-- Filter & Search Controls -->
+                        <div class="flex flex-col sm:flex-row items-center justify-between gap-3 bg-white dark:bg-brand-darkCard p-4 rounded-2xl border border-gray-100 dark:border-gray-800 shadow-sm">
+                            <div class="relative w-full sm:w-80">
+                                <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-3 text-gray-400 text-xs"></i>
+                                <input type="text" id="chapter-search-input" oninput="renderChapters()" placeholder="Filter chapters in this subject..." class="w-full pl-9 pr-4 py-2 rounded-xl bg-gray-50 dark:bg-gray-800 text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-brand-yellow border border-gray-200 dark:border-gray-700">
+                            </div>
+                            <div class="flex items-center gap-2 w-full sm:w-auto">
+                                <span class="text-xs font-semibold text-gray-500 whitespace-nowrap">Status:</span>
+                                <select id="chapter-status-filter" onchange="renderChapters()" class="w-full sm:w-auto px-3 py-2 rounded-xl bg-gray-50 dark:bg-gray-800 text-xs font-semibold focus:outline-none border border-gray-200 dark:border-gray-700">
+                                    <option value="ALL">All Statuses</option>
+                                    <option value="Not Started">Not Started</option>
+                                    <option value="Currently Studying">Currently Studying</option>
+                                    <option value="Completed">Completed</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Active Subject Header Banner -->
+                        <div id="active-subject-header" class="bg-gradient-to-r from-amber-500/10 via-brand-yellow/10 to-transparent border border-brand-yellow/30 p-5 rounded-3xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                            <div>
+                                <h3 id="active-subject-title" class="text-xl font-extrabold text-brand-black dark:text-white">Mathematics</h3>
+                                <p id="active-subject-subtitle" class="text-xs text-brand-subtext font-medium mt-0.5">0 of 0 Chapters Completed</p>
+                            </div>
+                            <div class="w-full sm:w-60 bg-gray-200 dark:bg-gray-700 rounded-full h-3.5 overflow-hidden">
+                                <div id="active-subject-progress-bar" class="bg-brand-yellow h-3.5 rounded-full transition-all duration-300" style="width: 0%"></div>
+                            </div>
+                        </div>
+
+                        <!-- Chapters List (Responsive 2-Column Desktop Grid) -->
+                        <div id="chapters-list-container" class="grid grid-cols-1 xl:grid-cols-2 gap-3.5">
+                            <!-- Chapters injected dynamically -->
+                        </div>
+                    </section>
+
+                    <!-- TAB 3: REVISION CALENDAR -->
+                    <section id="tab-calendar" class="tab-content space-y-6 hidden animate-fade-in">
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                            <div>
+                                <h2 class="text-2xl font-extrabold">Interactive Revision Calendar</h2>
+                                <p class="text-sm text-brand-subtext">Track past, present, and upcoming spaced repetition milestones on your desktop schedule.</p>
+                            </div>
+
+                            <!-- View Switches -->
+                            <div class="flex items-center bg-gray-200 dark:bg-gray-800 p-1 rounded-xl text-xs font-bold self-start sm:self-auto">
+                                <button onclick="setCalendarView('month')" id="cal-view-month" class="px-4 py-2 rounded-lg bg-white dark:bg-brand-darkCard text-brand-black dark:text-white shadow-sm">Monthly</button>
+                                <button onclick="setCalendarView('week')" id="cal-view-week" class="px-4 py-2 rounded-lg text-gray-500 hover:text-brand-black dark:hover:text-white">Weekly</button>
+                                <button onclick="setCalendarView('day')" id="cal-view-day" class="px-4 py-2 rounded-lg text-gray-500 hover:text-brand-black dark:hover:text-white">Daily</button>
+                            </div>
+                        </div>
+
+                        <!-- Calendar Navigation Bar -->
+                        <div class="flex items-center justify-between bg-white dark:bg-brand-darkCard p-4 rounded-2xl border border-gray-100 dark:border-gray-800 shadow-sm">
+                            <button onclick="navigateCalendar(-1)" class="px-3.5 py-2 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-600 dark:text-gray-300 font-bold text-xs flex items-center gap-2">
+                                <i class="fa-solid fa-chevron-left"></i> Previous
+                            </button>
+                            <div class="flex items-center gap-3">
+                                <h3 id="calendar-title" class="text-base md:text-lg font-extrabold">November 2026</h3>
+                                <button onclick="goToCalendarToday()" class="px-3 py-1 rounded-lg bg-brand-yellow text-brand-black text-xs font-extrabold hover:bg-brand-yellowLight transition-all">Today</button>
+                            </div>
+                            <button onclick="navigateCalendar(1)" class="px-3.5 py-2 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-600 dark:text-gray-300 font-bold text-xs flex items-center gap-2">
+                                Next <i class="fa-solid fa-chevron-right"></i>
+                            </button>
+                        </div>
+
+                        <!-- Calendar Content Body -->
+                        <div id="calendar-render-area" class="bg-white dark:bg-brand-darkCard p-4 md:p-6 rounded-3xl border border-gray-100 dark:border-gray-800 shadow-sm min-h-[460px]">
+                            <!-- Injected Month / Week / Day view -->
+                        </div>
+                    </section>
+
+                    <!-- TAB 4: ANALYTICS & GAMIFICATION -->
+                    <section id="tab-analytics" class="tab-content space-y-6 hidden animate-fade-in">
+                        <div>
+                            <h2 class="text-2xl font-extrabold">Analytics & Learning Achievements</h2>
+                            <p class="text-sm text-brand-subtext">Visualize study consistency, retention ratings, and unlock CBSE mastery badges.</p>
+                        </div>
+
+                        <!-- Top Stats Grid -->
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                            <div class="bg-white dark:bg-brand-darkCard p-5 rounded-3xl border border-gray-100 dark:border-gray-800 shadow-sm">
+                                <div class="text-xs text-brand-subtext font-semibold mb-1">Completion Rate</div>
+                                <div id="analytics-completion-rate" class="text-2xl lg:text-3xl font-extrabold text-brand-black dark:text-white">0%</div>
+                            </div>
+                            <div class="bg-white dark:bg-brand-darkCard p-5 rounded-3xl border border-gray-100 dark:border-gray-800 shadow-sm">
+                                <div class="text-xs text-brand-subtext font-semibold mb-1">Total XP Earned</div>
+                                <div id="analytics-total-xp" class="text-2xl lg:text-3xl font-extrabold text-brand-yellow">0 XP</div>
+                            </div>
+                            <div class="bg-white dark:bg-brand-darkCard p-5 rounded-3xl border border-gray-100 dark:border-gray-800 shadow-sm">
+                                <div class="text-xs text-brand-subtext font-semibold mb-1">Current Streak</div>
+                                <div id="analytics-current-streak" class="text-2xl lg:text-3xl font-extrabold text-orange-500">0 Days</div>
+                            </div>
+                            <div class="bg-white dark:bg-brand-darkCard p-5 rounded-3xl border border-gray-100 dark:border-gray-800 shadow-sm">
+                                <div class="text-xs text-brand-subtext font-semibold mb-1">Longest Streak</div>
+                                <div id="analytics-longest-streak" class="text-2xl lg:text-3xl font-extrabold text-emerald-500">0 Days</div>
+                            </div>
+                        </div>
+
+                        <!-- Visual Charts Section (Desktop Dual Column) -->
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                            <!-- Weekly Activity Chart -->
+                            <div class="bg-white dark:bg-brand-darkCard p-6 rounded-3xl border border-gray-100 dark:border-gray-800 shadow-sm space-y-4">
+                                <div class="flex items-center justify-between">
+                                    <h3 class="text-lg font-bold">Weekly Revision Intensity</h3>
+                                    <span class="text-xs text-brand-subtext">Past 7 Days</span>
+                                </div>
+                                <div class="h-64 flex items-end justify-between gap-2 pt-8 px-2 border-b border-gray-100 dark:border-gray-800" id="weekly-chart-bars">
+                                    <!-- Custom HTML/CSS Bar Chart Injected -->
+                                </div>
+                            </div>
+
+                            <!-- Subject Breakdown Chart -->
+                            <div class="bg-white dark:bg-brand-darkCard p-6 rounded-3xl border border-gray-100 dark:border-gray-800 shadow-sm space-y-4">
+                                <div class="flex items-center justify-between">
+                                    <h3 class="text-lg font-bold">Subject Completion Comparison</h3>
+                                    <span class="text-xs text-brand-subtext">Overall Progress</span>
+                                </div>
+                                <div id="subject-breakdown-list" class="space-y-3.5 pt-2">
+                                    <!-- Dynamic Subject progress comparisons -->
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Badges & Achievements Grid -->
+                        <div class="bg-white dark:bg-brand-darkCard p-6 rounded-3xl border border-gray-100 dark:border-gray-800 shadow-sm space-y-4">
+                            <div class="flex items-center justify-between">
+                                <h3 class="text-lg font-bold flex items-center gap-2">
+                                    <i class="fa-solid fa-award text-brand-yellow"></i>
+                                    Unlocked Achievements
+                                </h3>
+                                <span class="text-xs text-brand-subtext">Earn XP to unlock trophies</span>
+                            </div>
+                            <div id="badges-grid" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
+                                <!-- Badges dynamically rendered -->
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- TAB 5: SETTINGS & CUSTOMIZATION (Desktop 2-Column Grid) -->
+                    <section id="tab-settings" class="tab-content space-y-6 hidden animate-fade-in">
+                        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                            <div>
+                                <h2 class="text-2xl font-extrabold">App Settings & Data Management</h2>
+                                <p class="text-sm text-brand-subtext">Configure your study dashboard, daily limits, audio preferences, and backups.</p>
+                            </div>
+                            <div class="text-xs text-brand-subtext bg-white dark:bg-brand-darkCard px-3 py-1.5 rounded-xl border border-gray-200 dark:border-gray-800">
+                                Storage: <span class="text-brand-black dark:text-white font-bold">Local Browser Storage</span>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                            <!-- Card 1: Experience & Preferences -->
+                            <div class="bg-white dark:bg-brand-darkCard rounded-3xl border border-gray-100 dark:border-gray-800 shadow-sm p-6 space-y-6">
+                                <h3 class="text-base font-extrabold flex items-center gap-2">
+                                    <i class="fa-solid fa-sliders text-brand-yellow"></i> Experience Preferences
+                                </h3>
+                                <div class="space-y-5 divide-y divide-gray-100 dark:divide-gray-800">
+                                    <div class="flex items-center justify-between pt-1">
+                                        <div>
+                                            <div class="font-bold text-sm">Sound Effects</div>
+                                            <div class="text-xs text-brand-subtext">Synthesized audio cues when completing revisions.</div>
+                                        </div>
+                                        <label class="relative inline-flex items-center cursor-pointer">
+                                            <input type="checkbox" id="setting-sound-toggle" onchange="toggleSoundSetting(this.checked)" class="sr-only peer" checked>
+                                            <div class="w-11 h-6 bg-gray-300 peer-focus:outline-none rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-brand-yellow"></div>
+                                        </label>
+                                    </div>
+                                    <div class="flex items-center justify-between pt-5">
+                                        <div>
+                                            <div class="font-bold text-sm">Dark Theme</div>
+                                            <div class="text-xs text-brand-subtext">Switch between light and high-contrast dark palette.</div>
+                                        </div>
+                                        <button onclick="toggleDarkMode()" class="px-4 py-2 rounded-xl bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 font-bold text-xs transition-colors flex items-center gap-2">
+                                            <i class="fa-solid fa-moon dark:hidden"></i>
+                                            <i class="fa-solid fa-sun hidden dark:inline text-brand-yellow"></i>
+                                            <span>Toggle Theme</span>
+                                        </button>
+                                    </div>
+                                    <div class="flex items-center justify-between pt-5">
+                                        <div>
+                                            <div class="font-bold text-sm">Academic Grade</div>
+                                            <div class="text-xs text-brand-subtext">Current syllabus track.</div>
+                                        </div>
+                                        <button onclick="quickSwitchClass(state.selectedClass === 'Class 10' ? 'Class 9' : 'Class 10')" class="px-3.5 py-1.5 rounded-xl bg-gray-100 dark:bg-gray-800 font-bold text-xs hover:bg-brand-yellow hover:text-brand-black transition-colors">
+                                            Switch to <span id="settings-alt-class">Class 9</span>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Card 2: Workload & Spacing Engine -->
+                            <div class="bg-white dark:bg-brand-darkCard rounded-3xl border border-gray-100 dark:border-gray-800 shadow-sm p-6 space-y-6">
+                                <h3 class="text-base font-extrabold flex items-center gap-2">
+                                    <i class="fa-solid fa-gauge-high text-brand-yellow"></i> Workload & Spacing Engine
+                                </h3>
+                                <div class="space-y-4">
+                                    <div class="flex items-center justify-between">
+                                        <div>
+                                            <div class="font-bold text-sm">Daily Revision Capacity Limit</div>
+                                            <div class="text-xs text-brand-subtext">Max auto-scheduled tasks per day (prevents burnout).</div>
+                                        </div>
+                                        <span id="daily-limit-val" class="font-extrabold text-xl text-brand-yellow bg-brand-black px-3 py-1 rounded-xl">5</span>
+                                    </div>
+                                    <input type="range" id="daily-limit-slider" min="3" max="15" value="5" step="1" onchange="updateDailyLimit(this.value)" class="w-full accent-brand-yellow cursor-pointer">
+                                    <div class="flex justify-between text-[11px] text-gray-400 font-semibold px-1">
+                                        <span>3 tasks (Relaxed)</span>
+                                        <span>5 tasks (Balanced)</span>
+                                        <span>15 tasks (Intense)</span>
+                                    </div>
+                                    <div class="p-3 bg-gray-50 dark:bg-gray-800/50 rounded-2xl border border-gray-100 dark:border-gray-800 text-xs text-gray-500 leading-relaxed">
+                                        💡 If revisions accumulate during off-days, our algorithm redistributes overdue tasks evenly across upcoming days so you never face task overload.
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Card 3: Backup & Restore -->
+                            <div class="bg-white dark:bg-brand-darkCard rounded-3xl border border-gray-100 dark:border-gray-800 shadow-sm p-6 space-y-4">
+                                <h3 class="text-base font-extrabold flex items-center gap-2">
+                                    <i class="fa-solid fa-cloud-arrow-up text-brand-yellow"></i> Backup & Cloud Portability
+                                </h3>
+                                <p class="text-xs text-brand-subtext leading-relaxed">
+                                    Save your study progress, completion history, streaks, and XP score to a JSON file. Transfer between laptop and desktop seamlessly.
+                                </p>
+                                <div class="flex flex-wrap gap-3 pt-2">
+                                    <button onclick="exportBackupData()" class="px-5 py-3 bg-brand-black text-white dark:bg-brand-yellow dark:text-brand-black rounded-xl font-bold text-xs flex items-center gap-2 shadow-sm hover:opacity-95 transition-opacity">
+                                        <i class="fa-solid fa-download"></i> Export Backup (JSON)
+                                    </button>
+                                    <label class="px-5 py-3 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-xl font-bold text-xs flex items-center gap-2 cursor-pointer transition-colors">
+                                        <i class="fa-solid fa-upload"></i> Restore Backup
+                                        <input type="file" id="import-backup-file" accept=".json" class="hidden" onchange="importBackupData(event)">
+                                    </label>
+                                </div>
+                            </div>
+
+                            <!-- Card 4: Danger Zone -->
+                            <div class="bg-white dark:bg-brand-darkCard rounded-3xl border border-red-200 dark:border-red-950/60 shadow-sm p-6 space-y-4 bg-red-500/[0.02]">
+                                <h3 class="text-base font-extrabold text-brand-danger flex items-center gap-2">
+                                    <i class="fa-solid fa-triangle-exclamation"></i> Danger Zone
+                                </h3>
+                                <p class="text-xs text-brand-subtext leading-relaxed">
+                                    Permanently erase all chapter statuses, completion logs, spaced repetition tasks, and reset your streak back to day 0.
+                                </p>
+                                <div class="pt-2">
+                                    <button onclick="confirmResetAllData()" class="px-5 py-3 bg-brand-danger text-white rounded-xl font-bold text-xs hover:bg-red-600 transition-colors flex items-center gap-2 shadow-sm">
+                                        <i class="fa-solid fa-trash-can"></i> Reset All Application Data
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                </div>
+            </main>
+        </div>
+
+        <!-- MOBILE BOTTOM NAVIGATION (Hidden on Desktop) -->
+        <nav class="md:hidden fixed bottom-0 left-0 right-0 bg-brand-black border-t border-gray-800 text-gray-400 flex items-center justify-around py-2.5 z-40 shadow-2xl">
+            <button onclick="switchTab('dashboard')" id="mobile-nav-dashboard" class="flex flex-col items-center gap-1 text-brand-yellow">
+                <i class="fa-solid fa-house text-lg"></i>
+                <span class="text-[10px] font-bold">Home</span>
+            </button>
+            <button onclick="switchTab('subjects')" id="mobile-nav-subjects" class="flex flex-col items-center gap-1">
+                <i class="fa-solid fa-book-open text-lg"></i>
+                <span class="text-[10px] font-bold">Subjects</span>
+            </button>
+            <button onclick="switchTab('calendar')" id="mobile-nav-calendar" class="flex flex-col items-center gap-1">
+                <i class="fa-solid fa-calendar-days text-lg"></i>
+                <span class="text-[10px] font-bold">Calendar</span>
+            </button>
+            <button onclick="switchTab('analytics')" id="mobile-nav-analytics" class="flex flex-col items-center gap-1">
+                <i class="fa-solid fa-chart-line text-lg"></i>
+                <span class="text-[10px] font-bold">Analytics</span>
+            </button>
+            <button onclick="switchTab('settings')" id="mobile-nav-settings" class="flex flex-col items-center gap-1">
+                <i class="fa-solid fa-sliders text-lg"></i>
+                <span class="text-[10px] font-bold">Settings</span>
+            </button>
+        </nav>
+    </div>
+
+    <!-- REVISION EXECUTION / MEMORY RATING MODAL -->
+    <div id="revision-modal" class="fixed inset-0 z-50 bg-brand-black/80 flex items-center justify-center p-4 backdrop-blur-sm hidden">
+        <div class="bg-white dark:bg-brand-darkCard w-full max-w-md rounded-3xl p-6 shadow-2xl space-y-6 relative border border-gray-100 dark:border-gray-800">
+            <button onclick="closeRevisionModal()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 dark:hover:text-white text-lg">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+
+            <!-- Modal Step 1: Start Revision -->
+            <div id="rev-modal-step-1" class="space-y-4 text-center">
+                <div id="rev-modal-subject-pill" class="inline-block px-3 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-800">
+                    Science
+                </div>
+                <h3 id="rev-modal-chapter-title" class="text-2xl font-extrabold leading-snug">Life Processes</h3>
+                <p id="rev-modal-revision-tag" class="text-sm font-semibold text-gray-500">Revision Task #2</p>
+
+                <div class="bg-gray-50 dark:bg-gray-800/60 p-4 rounded-2xl text-xs text-gray-600 dark:text-gray-300 text-left space-y-1 border border-gray-100 dark:border-gray-700">
+                    <p>💡 <strong>Revision Recall Tip:</strong> Try to actively recall key formulas, concepts, or diagrams on paper before opening your notes.</p>
+                </div>
+
+                <button onclick="proceedToMemoryRating()" class="w-full py-3.5 bg-brand-yellow hover:bg-brand-yellowLight text-brand-black font-extrabold rounded-2xl shadow-md transition-all text-base">
+                    Mark as Reviewed
+                </button>
+            </div>
+
+            <!-- Modal Step 2: Memory Rating Feedback -->
+            <div id="rev-modal-step-2" class="space-y-5 text-center hidden">
+                <div class="w-14 h-14 bg-brand-yellow text-brand-black rounded-2xl flex items-center justify-center mx-auto text-2xl font-bold shadow-md">
+                    <i class="fa-solid fa-brain"></i>
+                </div>
+                <div>
+                    <h3 class="text-xl font-extrabold">How well did you remember?</h3>
+                    <p class="text-xs text-brand-subtext mt-1">This tunes your next spaced repetition schedule.</p>
+                </div>
+
+                <div class="grid grid-cols-1 gap-3">
+                    <button onclick="completeActiveRevision('Easy')" class="p-4 rounded-2xl border-2 border-emerald-200 dark:border-emerald-900/40 hover:border-emerald-500 bg-emerald-50/50 dark:bg-emerald-950/20 text-left flex items-center justify-between group transition-all">
+                        <div>
+                            <div class="font-extrabold text-emerald-700 dark:text-emerald-400 text-sm">🟢 Easy</div>
+                            <div class="text-[11px] text-gray-500">Remembered almost everything (+10 XP)</div>
+                        </div>
+                        <i class="fa-solid fa-chevron-right text-emerald-500 group-hover:translate-x-1 transition-transform"></i>
+                    </button>
+
+                    <button onclick="completeActiveRevision('Average')" class="p-4 rounded-2xl border-2 border-amber-200 dark:border-amber-900/40 hover:border-amber-500 bg-amber-50/50 dark:bg-amber-950/20 text-left flex items-center justify-between group transition-all">
+                        <div>
+                            <div class="font-extrabold text-amber-700 dark:text-amber-400 text-sm">🟡 Average</div>
+                            <div class="text-[11px] text-gray-500">Forgot a few minor details (+15 XP)</div>
+                        </div>
+                        <i class="fa-solid fa-chevron-right text-amber-500 group-hover:translate-x-1 transition-transform"></i>
+                    </button>
+
+                    <button onclick="completeActiveRevision('Difficult')" class="p-4 rounded-2xl border-2 border-red-200 dark:border-red-900/40 hover:border-red-500 bg-red-50/50 dark:bg-red-950/20 text-left flex items-center justify-between group transition-all">
+                        <div>
+                            <div class="font-extrabold text-red-700 dark:text-red-400 text-sm">🔴 Difficult</div>
+                            <div class="text-[11px] text-gray-500">Struggled to recall main points (+20 XP)</div>
+                        </div>
+                        <i class="fa-solid fa-chevron-right text-red-500 group-hover:translate-x-1 transition-transform"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ADD CUSTOM CHAPTER MODAL -->
+    <div id="add-chapter-modal" class="fixed inset-0 z-50 bg-brand-black/80 flex items-center justify-center p-4 backdrop-blur-sm hidden">
+        <div class="bg-white dark:bg-brand-darkCard w-full max-w-md rounded-3xl p-6 shadow-2xl space-y-4 relative border border-gray-100 dark:border-gray-800">
+            <button onclick="closeAddChapterModal()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 dark:hover:text-white text-lg">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            <h3 class="text-xl font-extrabold">Add Custom Chapter</h3>
+
+            <div class="space-y-3">
+                <div>
+                    <label class="block text-xs font-semibold text-gray-500 mb-1">Subject</label>
+                    <select id="modal-chapter-subject-select" class="w-full px-3 py-2.5 rounded-xl bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-xs font-bold focus:outline-none focus:ring-2 focus:ring-brand-yellow">
+                        <!-- Dynamic Options -->
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-gray-500 mb-1">Chapter Name</label>
+                    <input type="text" id="modal-chapter-name-input" placeholder="e.g., Statistics & Probability" class="w-full px-3 py-2.5 rounded-xl bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-brand-yellow">
+                </div>
+            </div>
+
+            <button onclick="saveCustomChapter()" class="w-full py-3 bg-brand-yellow text-brand-black font-extrabold rounded-2xl shadow-md hover:bg-brand-yellowLight text-sm transition-all">
+                Save Chapter
+            </button>
+        </div>
+    </div>
+
+    <!-- ADD SUBJECT MODAL -->
+    <div id="add-subject-modal" class="fixed inset-0 z-50 bg-brand-black/80 flex items-center justify-center p-4 backdrop-blur-sm hidden">
+        <div class="bg-white dark:bg-brand-darkCard w-full max-w-md rounded-3xl p-6 shadow-2xl space-y-4 relative border border-gray-100 dark:border-gray-800">
+            <button onclick="closeAddSubjectModal()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 dark:hover:text-white text-lg">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            <h3 class="text-xl font-extrabold">Add New Subject</h3>
+
+            <div>
+                <label class="block text-xs font-semibold text-gray-500 mb-1">Subject Name</label>
+                <input type="text" id="modal-subject-name-input" placeholder="e.g., Information Technology" class="w-full px-3 py-2.5 rounded-xl bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-brand-yellow">
+            </div>
+
+            <button onclick="saveCustomSubject()" class="w-full py-3 bg-brand-yellow text-brand-black font-extrabold rounded-2xl shadow-md hover:bg-brand-yellowLight text-sm transition-all">
+                Add Subject
+            </button>
+        </div>
+    </div>
+
+    <!-- TOAST NOTIFICATION CONTAINER -->
+    <div id="toast-container" class="fixed bottom-20 md:bottom-6 right-6 z-50 space-y-2 pointer-events-none"></div>
+
+    <!-- APP LOGIC JAVASCRIPT -->
+    <script>
+        /* ==========================================================================
+           1. HARDCODED EMBEDDED SYLLABUS DATASET (CBSE Class 9 & Class 10)
+           ========================================================================== */
+        const DEFAULT_SYLLABUS = {
+            "Class 10": {
+                "Mathematics": [
+                    "Real Numbers", "Polynomials", "Pair of Linear Equations in Two Variables",
+                    "Quadratic Equations", "Arithmetic Progressions", "Triangles",
+                    "Coordinate Geometry", "Introduction to Trigonometry", "Some Applications of Trigonometry",
+                    "Circles", "Areas Related to Circles", "Surface Areas and Volumes",
+                    "Statistics", "Probability"
+                ],
+                "Science": [
+                    "Chemical Reactions and Equations", "Acids, Bases and Salts", "Metals and Non-metals",
+                    "Carbon and its Compounds", "Life Processes", "Control and Coordination",
+                    "How do Organisms Reproduce?", "Heredity", "Light – Reflection and Refraction",
+                    "The Human Eye and the Colourful World", "Electricity", "Magnetic Effects of Electric Current",
+                    "Our Environment"
+                ],
+                "Social Science": [
+                    "The Rise of Nationalism in Europe", "Nationalism in India", "The Making of a Global World",
+                    "Resources and Development", "Forest and Wildlife Resources", "Water Resources",
+                    "Agriculture", "Power Sharing", "Federalism", "Gender, Religion and Caste",
+                    "Development", "Sectors of the Indian Economy", "Money and Credit"
+                ],
+                "English": [
+                    "A Letter to God", "Nelson Mandela: Long Walk to Freedom", "Two Stories About Flying",
+                    "From the Diary of Anne Frank", "Glimpses of India", "Mijbil the Otter",
+                    "Madam Rides the Bus", "The Sermon at Benares", "The Proposal",
+                    "A Triumph of Surgery", "The Thief's Story", "The Midnight Visitor",
+                    "A Question of Trust", "Footprints without Feet"
+                ],
+                "Hindi": [
+                    "सूरदास के पद", "राम-लक्ष्मण-परशुराम संवाद", "आत्मकथ्य",
+                    "उत्साह और अट नहीं रही है", "नेताजी का चश्मा", "बालगोबिन भगत",
+                    "लखनवी अंदाज", "माता का अंचल", "जॉर्ज पंचम की नाक"
+                ]
+            },
+            "Class 9": {
+                "Mathematics": [
+                    "Number Systems", "Polynomials", "Coordinate Geometry",
+                    "Linear Equations in Two Variables", "Introduction to Euclid's Geometry",
+                    "Lines and Angles", "Triangles", "Quadrilaterals", "Circles",
+                    "Heron's Formula", "Surface Areas and Volumes", "Statistics"
+                ],
+                "Science": [
+                    "Matter in Our Surroundings", "Is Matter Around Us Pure?", "Atoms and Molecules",
+                    "Structure of the Atom", "The Fundamental Unit of Life", "Tissues",
+                    "Motion", "Force and Laws of Motion", "Gravitation", "Work and Energy",
+                    "Sound", "Improvement in Food Resources"
+                ],
+                "Social Science": [
+                    "The French Revolution", "Socialism in Europe and the Russian Revolution",
+                    "Nazism and the Rise of Hitler", "India - Size and Location",
+                    "Physical Features of India", "Drainage", "Climate", "What is Democracy? Why Democracy?",
+                    "Constitutional Design", "Electoral Politics", "The Story of Village Palampur",
+                    "People as Resource"
+                ],
+                "English": [
+                    "The Fun They Had", "The Sound of Music", "The Little Girl",
+                    "A Truly Beautiful Mind", "The Snake and the Mirror", "My Childhood",
+                    "Reach for the Top", "The Lost Child", "The Adventures of Toto",
+                    "In the Kingdom of Fools", "The Happy Prince"
+                ],
+                "Hindi": [
+                    "दो बैलों की कथा", "ल्हासा की ओर", "उपभोक्तावाद की संस्कृति",
+                    "साँवले सपनों की याद", "कबीर साखियाँ एवं सबद", "वाख",
+                    "सवैये", "कैदी और कोकिला"
+                ]
+            }
+        };
+
+        const REVISION_INTERVALS = [1, 3, 7, 14, 30]; // R1, R2, R3, R4, R5 standard days
+
+        /* ==========================================================================
+           2. STATE MANAGEMENT & LOCAL STORAGE
+           ========================================================================== */
+        let state = {
+            selectedClass: "Class 10",
+            selectedSubjects: ["Mathematics", "Science", "Social Science", "English", "Hindi"],
+            chapters: [], // { id, class, subject, name, chapterNumber, status, completedDate }
+            revisions: [], // { id, chapterId, subject, chapterName, revisionNumber, scheduledDate, status, rating, completedDate }
+            streak: 0,
+            longestStreak: 0,
+            lastStreakDate: null,
+            xp: 0,
+            achievements: [],
+            settings: {
+                soundEnabled: true,
+                dailyLimit: 5,
+                darkMode: false
+            },
+            activeTab: 'dashboard',
+            activeSubjectTab: null,
+            calendarDate: new Date(),
+            calendarView: 'month', // 'month'|'week'|'day'
+            activeRevisionTask: null
+        };
+
+        /* ==========================================================================
+           3. APPLICATION INITIALIZATION & ONBOARDING
+           ========================================================================== */
+        window.onload = function() {
+            loadFromLocalStorage();
+            applyTheme();
+            updateGreeting();
+
+            // Check if onboarding completed
+            const isConfigured = localStorage.getItem('study_guy_configured');
+            if (!isConfigured) {
+                document.getElementById('onboarding-modal').classList.remove('hidden');
+                renderOnboardingSubjects();
+            } else {
+                checkAndRebalanceMissedRevisions();
+                renderAllTabs();
+            }
+
+            setupKeyboardShortcuts();
+        };
+
+        function saveToLocalStorage() {
+            localStorage.setItem('study_guy_state', JSON.stringify(state));
+            localStorage.setItem('study_guy_configured', 'true');
+        }
+
+        function loadFromLocalStorage() {
+            const raw = localStorage.getItem('study_guy_state');
+            if (raw) {
+                try {
+                    const parsed = JSON.parse(raw);
+                    state = { ...state, ...parsed };
+                } catch(e) {
+                    console.error('Error parsing localStorage state:', e);
+                }
+            }
+        }
+
+        /* Onboarding Handlers */
+        let onboardTempClass = "Class 10";
+        let onboardTempSubjects = ["Mathematics", "Science", "Social Science", "English", "Hindi"];
+
+        function nextOnboardingStep(step) {
+            document.getElementById('onboard-step-1').classList.add('hidden');
+            document.getElementById('onboard-step-2').classList.add('hidden');
+            document.getElementById('onboard-step-3').classList.add('hidden');
+            document.getElementById(`onboard-step-${step}`).classList.remove('hidden');
+        }
+
+        function selectOnboardingClass(cls) {
+            onboardTempClass = cls;
+            document.getElementById('btn-class-9').classList.remove('border-brand-yellow', 'bg-amber-50/50');
+            document.getElementById('btn-class-10').classList.remove('border-brand-yellow', 'bg-amber-50/50');
+
+            if (cls === 'Class 9') {
+                document.getElementById('btn-class-9').classList.add('border-brand-yellow', 'bg-amber-50/50');
+            } else {
+                document.getElementById('btn-class-10').classList.add('border-brand-yellow', 'bg-amber-50/50');
+            }
+            renderOnboardingSubjects();
+        }
+
+        function renderOnboardingSubjects() {
+            const subjects = DEFAULT_SYLLABUS[onboardTempClass] ? Object.keys(DEFAULT_SYLLABUS[onboardTempClass]) : [];
+            const container = document.getElementById('onboarding-subjects-list');
+            container.innerHTML = subjects.map(sub => `
+                <label class="flex items-center gap-2 p-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 cursor-pointer text-xs font-bold hover:border-brand-yellow transition-all">
+                    <input type="checkbox" checked value="${sub}" onchange="toggleOnboardSubject('${sub}', this.checked)" class="accent-brand-yellow w-4 h-4 rounded">
+                    <span>${sub}</span>
+                </label>
+            `).join('');
+        }
+
+        function toggleOnboardSubject(sub, checked) {
+            if (checked && !onboardTempSubjects.includes(sub)) onboardTempSubjects.push(sub);
+            if (!checked) onboardTempSubjects = onboardTempSubjects.filter(s => s !== sub);
+        }
+
+        function finishOnboarding() {
+            state.selectedClass = onboardTempClass;
+            state.selectedSubjects = onboardTempSubjects;
+            state.chapters = [];
+
+            // Populate chapters from embedded syllabus
+            const classData = DEFAULT_SYLLABUS[state.selectedClass];
+            if (classData) {
+                state.selectedSubjects.forEach(subject => {
+                    if (classData[subject]) {
+                        classData[subject].forEach((chName, idx) => {
+                            state.chapters.push({
+                                id: 'ch_' + Math.random().toString(36).substr(2, 9),
+                                class: state.selectedClass,
+                                subject: subject,
+                                name: chName,
+                                chapterNumber: idx + 1,
+                                status: 'Not Started',
+                                completedDate: null
+                            });
+                        });
+                    }
+                });
+            }
+
+            state.activeSubjectTab = state.selectedSubjects[0] || null;
+            saveToLocalStorage();
+            document.getElementById('onboarding-modal').classList.add('hidden');
+            renderAllTabs();
+            showToast('Welcome to Study Guy! Revision plan initialized.');
+        }
+
+        /* CSV Import Logic */
+        function handleCSVImport(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const text = e.target.result;
+                const lines = text.split('\n');
+                let addedCount = 0;
+
+                lines.forEach((line, index) => {
+                    if (index === 0 && line.toLowerCase().includes('chapter')) return; // Skip Header
+                    const parts = line.split(',').map(p => p.trim());
+                    if (parts.length >= 4) {
+                        const [cls, subject, num, name] = parts;
+                        if (name) {
+                            state.chapters.push({
+                                id: 'ch_csv_' + Math.random().toString(36).substr(2, 9),
+                                class: cls || state.selectedClass,
+                                subject: subject || "Custom",
+                                name: name.replace(/"/g, ''),
+                                chapterNumber: parseInt(num) || state.chapters.length + 1,
+                                status: 'Not Started',
+                                completedDate: null
+                            });
+                            if (!state.selectedSubjects.includes(subject)) {
+                                state.selectedSubjects.push(subject);
+                            }
+                            addedCount++;
+                        }
+                    }
+                });
+
+                showToast(`Imported ${addedCount} custom chapters from CSV!`);
+                saveToLocalStorage();
+                renderAllTabs();
+            };
+            reader.readAsText(file);
+        }
+
+        /* ==========================================================================
+           4. AUDIO SYNTHESIZER (Web Audio API)
+           ========================================================================== */
+        function playTone(type = 'success') {
+            if (!state.settings.soundEnabled) return;
+            try {
+                const ctx = new (window.AudioContext || window.webkitAudioContext)();
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+
+                if (type === 'success') {
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(523.25, ctx.currentTime); // C5
+                    osc.frequency.exponentialRampToValueAtTime(659.25, ctx.currentTime + 0.1); // E5
+                    osc.frequency.exponentialRampToValueAtTime(783.99, ctx.currentTime + 0.2); // G5
+                    gain.gain.setValueAtTime(0.15, ctx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.35);
+                    osc.start();
+                    osc.stop(ctx.currentTime + 0.35);
+                } else if (type === 'click') {
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(300, ctx.currentTime);
+                    gain.gain.setValueAtTime(0.05, ctx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.05);
+                    osc.start();
+                    osc.stop(ctx.currentTime + 0.05);
+                } else if (type === 'badge') {
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(440, ctx.currentTime);
+                    osc.frequency.exponentialRampToValueAtTime(880, ctx.currentTime + 0.25);
+                    gain.gain.setValueAtTime(0.2, ctx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.4);
+                    osc.start();
+                    osc.stop(ctx.currentTime + 0.4);
+                }
+            } catch (e) {
+                // Audio context suppressed
+            }
+        }
+
+        /* ==========================================================================
+           5. SMART REVISION ENGINE & MISSED REVISION RE-BALANCING
+           ========================================================================== */
+        function generateDefaultRevisionsForChapter(chapter) {
+            // Remove existing uncompleted revisions for this chapter to prevent duplicates
+            state.revisions = state.revisions.filter(r => !(r.chapterId === chapter.id && r.status === 'pending'));
+
+            const today = new Date();
+            REVISION_INTERVALS.forEach((interval, idx) => {
+                const targetDate = new Date(today);
+                targetDate.setDate(targetDate.getDate() + interval);
+
+                state.revisions.push({
+                    id: 'rev_' + Math.random().toString(36).substr(2, 9),
+                    chapterId: chapter.id,
+                    subject: chapter.subject,
+                    chapterName: chapter.name,
+                    revisionNumber: idx + 1,
+                    scheduledDate: targetDate.toISOString().split('T')[0],
+                    status: 'pending',
+                    rating: null,
+                    completedDate: null
+                });
+            });
+
+            checkAndRebalanceMissedRevisions();
+            saveToLocalStorage();
+        }
+
+        function checkAndRebalanceMissedRevisions() {
+            const todayStr = new Date().toISOString().split('T')[0];
+            const maxDaily = state.settings.dailyLimit || 5;
+
+            // Find overdue pending tasks
+            let pendingTasks = state.revisions.filter(r => r.status === 'pending');
+            
+            // Sort by scheduled date (older first) then revision number
+            pendingTasks.sort((a, b) => a.scheduledDate.localeCompare(b.scheduledDate) || a.revisionNumber - b.revisionNumber);
+
+            // Group tasks by scheduled date
+            let countsByDate = {};
+            pendingTasks.forEach(r => {
+                countsByDate[r.scheduledDate] = (countsByDate[r.scheduledDate] || 0) + 1;
+            });
+
+            let changed = false;
+
+            // Re-balance overdue dates
+            pendingTasks.forEach(task => {
+                if (task.scheduledDate < todayStr) {
+                    let checkDate = new Date();
+                    while (true) {
+                        let dateKey = checkDate.toISOString().split('T')[0];
+                        if ((countsByDate[dateKey] || 0) < maxDaily) {
+                            countsByDate[task.scheduledDate] = Math.max(0, (countsByDate[task.scheduledDate] || 0) - 1);
+                            task.scheduledDate = dateKey;
+                            countsByDate[dateKey] = (countsByDate[dateKey] || 0) + 1;
+                            changed = true;
+                            break;
+                        }
+                        checkDate.setDate(checkDate.getDate() + 1);
+                    }
+                }
+            });
+
+            if (changed) saveToLocalStorage();
+        }
+
+        /* ==========================================================================
+           6. UI NAVIGATION & DESKTOP ENHANCEMENTS
+           ========================================================================== */
+        function switchTab(tabId) {
+            playTone('click');
+            state.activeTab = tabId;
+
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            const activeSection = document.getElementById(`tab-${tabId}`);
+            if (activeSection) activeSection.classList.remove('hidden');
+
+            // Sidebar Highlight Update
+            document.querySelectorAll('.nav-item').forEach(el => {
+                el.classList.remove('text-brand-yellow', 'bg-white/10');
+                el.classList.add('text-gray-400');
+            });
+            const activeNav = document.getElementById(`nav-${tabId}`);
+            if (activeNav) {
+                activeNav.classList.add('text-brand-yellow', 'bg-white/10');
+                activeNav.classList.remove('text-gray-400');
+            }
+
+            // Mobile Nav Highlight
+            const mobileTabs = ['dashboard', 'subjects', 'calendar', 'analytics', 'settings'];
+            mobileTabs.forEach(t => {
+                const mobEl = document.getElementById(`mobile-nav-${t}`);
+                if (mobEl) {
+                    if (t === tabId) mobEl.classList.add('text-brand-yellow');
+                    else mobEl.classList.remove('text-brand-yellow');
+                }
+            });
+
+            renderAllTabs();
+        }
+
+        function renderAllTabs() {
+            updateHeaderBadges();
+            updateDesktopTopBar();
+            if (state.activeTab === 'dashboard') renderDashboard();
+            else if (state.activeTab === 'subjects') renderSubjectsTab();
+            else if (state.activeTab === 'calendar') renderCalendar();
+            else if (state.activeTab === 'analytics') renderAnalytics();
+            else if (state.activeTab === 'settings') renderSettings();
+        }
+
+        function updateHeaderBadges() {
+            const badgeText = `${state.selectedClass} · CBSE`;
+            const sideBadge = document.getElementById('sidebar-class-badge');
+            if (sideBadge) sideBadge.innerText = badgeText;
+            const mobBadge = document.getElementById('mobile-class-badge');
+            if (mobBadge) mobBadge.innerText = badgeText;
+            const dashTag = document.getElementById('dashboard-class-tag');
+            if (dashTag) dashTag.innerHTML = `<i class="fa-solid fa-graduation-cap"></i> ${badgeText}`;
+
+            const sideStreak = document.getElementById('sidebar-streak-val');
+            if (sideStreak) sideStreak.innerText = `${state.streak} Days`;
+            const mobStreak = document.getElementById('mobile-streak-val');
+            if (mobStreak) mobStreak.innerText = `${state.streak}d`;
+            const sideXp = document.getElementById('sidebar-xp-val');
+            if (sideXp) sideXp.innerText = `${state.xp} XP`;
+        }
+
+        function updateDesktopTopBar() {
+            const titles = {
+                'dashboard': 'Dashboard Overview',
+                'subjects': 'Subjects & Chapter Tracker',
+                'calendar': 'Spaced Repetition Calendar',
+                'analytics': 'Learning Analytics & Badges',
+                'settings': 'App Settings & Workload Engine'
+            };
+            const titleEl = document.getElementById('desktop-page-title');
+            if (titleEl) {
+                titleEl.innerText = titles[state.activeTab] || 'Dashboard Overview';
+            }
+            const dateEl = document.getElementById('desktop-date-str');
+            if (dateEl) {
+                const now = new Date();
+                const formatted = now.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'short', day: 'numeric' });
+                dateEl.innerHTML = `<i class="fa-regular fa-calendar text-brand-yellow"></i> <span>Today is ${formatted}</span>`;
+            }
+            const classSel = document.getElementById('header-class-selector');
+            if (classSel && classSel.value !== state.selectedClass) {
+                classSel.value = state.selectedClass;
+            }
+            const altClassEl = document.getElementById('settings-alt-class');
+            if (altClassEl) {
+                altClassEl.innerText = state.selectedClass === 'Class 10' ? 'Class 9' : 'Class 10';
+            }
+            updateDesktopSoundUI();
+        }
+
+        function updateDesktopSoundUI() {
+            const icon = document.getElementById('desktop-sound-icon');
+            if (icon) {
+                if (state.settings.soundEnabled) {
+                    icon.className = 'fa-solid fa-volume-high text-brand-yellow';
+                } else {
+                    icon.className = 'fa-solid fa-volume-xmark text-gray-400';
+                }
+            }
+        }
+
+        function quickToggleSound() {
+            state.settings.soundEnabled = !state.settings.soundEnabled;
+            saveToLocalStorage();
+            updateDesktopSoundUI();
+            const toggle = document.getElementById('setting-sound-toggle');
+            if (toggle) toggle.checked = state.settings.soundEnabled;
+            showToast(state.settings.soundEnabled ? 'Sound cues enabled' : 'Sound cues muted');
+        }
+
+        function quickSwitchClass(newClass) {
+            if (newClass === state.selectedClass) return;
+            if (confirm(`Switch syllabus to ${newClass}? Your current chapter statuses will remain saved.`)) {
+                state.selectedClass = newClass;
+                onboardTempClass = newClass;
+                state.selectedSubjects = Object.keys(DEFAULT_SYLLABUS[newClass] || {});
+                
+                // If chapters for this class don't exist yet, seed them
+                const existing = state.chapters.filter(c => c.class === newClass);
+                if (existing.length === 0) {
+                    const classData = DEFAULT_SYLLABUS[newClass];
+                    if (classData) {
+                        state.selectedSubjects.forEach(subject => {
+                            if (classData[subject]) {
+                                classData[subject].forEach((chName, idx) => {
+                                    state.chapters.push({
+                                        id: 'ch_' + Math.random().toString(36).substr(2, 9),
+                                        class: newClass,
+                                        subject: subject,
+                                        name: chName,
+                                        chapterNumber: idx + 1,
+                                        status: 'Not Started',
+                                        completedDate: null
+                                    });
+                                });
+                            }
+                        });
+                    }
+                }
+                state.activeSubjectTab = state.selectedSubjects[0] || null;
+                saveToLocalStorage();
+                renderAllTabs();
+                showToast(`Switched to CBSE ${newClass} workspace!`);
+            } else {
+                const classSel = document.getElementById('header-class-selector');
+                if (classSel) classSel.value = state.selectedClass;
+            }
+        }
+
+        function handleGlobalSearch(query) {
+            if (!query || !query.trim()) return;
+            query = query.trim().toLowerCase();
+            
+            if (state.activeTab !== 'subjects') {
+                switchTab('subjects');
+            }
+            const subjSearch = document.getElementById('chapter-search-input');
+            if (subjSearch) {
+                subjSearch.value = query;
+                renderChapters();
+            }
+        }
+
+        function setupKeyboardShortcuts() {
+            window.addEventListener('keydown', function(e) {
+                if (['INPUT', 'SELECT', 'TEXTAREA'].includes(document.activeElement.tagName)) {
+                    if (e.key === 'Escape') {
+                        document.activeElement.blur();
+                        closeAllModals();
+                    }
+                    return;
+                }
+                if (e.key === 'Escape') {
+                    closeAllModals();
+                } else if (e.key === '/') {
+                    e.preventDefault();
+                    const globalSearch = document.getElementById('global-search-input');
+                    if (globalSearch) globalSearch.focus();
+                } else if (e.key === '1') {
+                    switchTab('dashboard');
+                } else if (e.key === '2') {
+                    switchTab('subjects');
+                } else if (e.key === '3') {
+                    switchTab('calendar');
+                } else if (e.key === '4') {
+                    switchTab('analytics');
+                } else if (e.key === '5') {
+                    switchTab('settings');
+                }
+            });
+        }
+
+        function closeAllModals() {
+            closeRevisionModal();
+            closeAddChapterModal();
+            closeAddSubjectModal();
+        }
+
+        function updateGreeting() {
+            const hour = new Date().getHours();
+            let g = "Good morning";
+            if (hour >= 12 && hour < 17) g = "Good afternoon";
+            else if (hour >= 17) g = "Good evening";
+            const greetingEl = document.getElementById('dashboard-greeting');
+            if (greetingEl) greetingEl.innerText = `${g}, Student! 👋`;
+        }
+
+        /* ==========================================================================
+           7. DASHBOARD LOGIC & RENDERING
+           ========================================================================== */
+        function renderDashboard() {
+            const todayStr = new Date().toISOString().split('T')[0];
+
+            // Today's Revisions
+            const todaysTasks = state.revisions.filter(r => r.scheduledDate === todayStr && r.status === 'pending');
+            const countBadge = document.getElementById('todays-count-badge');
+            if (countBadge) countBadge.innerText = `${todaysTasks.length} Tasks Scheduled`;
+
+            const listContainer = document.getElementById('todays-revisions-list');
+            if (todaysTasks.length === 0) {
+                const futureTasks = state.revisions
+                    .filter(r => r.status === 'pending' && r.scheduledDate > todayStr)
+                    .sort((a,b) => a.scheduledDate.localeCompare(b.scheduledDate));
+
+                let nextText = "No future revisions currently scheduled.";
+                if (futureTasks.length > 0) {
+                    nextText = `Next scheduled revision: <strong>${futureTasks[0].scheduledDate}</strong> (${futureTasks[0].chapterName})`;
+                }
+
+                listContainer.innerHTML = `
+                    <div class="col-span-full py-10 px-6 text-center bg-gray-50 dark:bg-gray-800/40 rounded-3xl border border-dashed border-gray-200 dark:border-gray-700 space-y-2">
+                        <div class="w-14 h-14 bg-amber-100 dark:bg-amber-950/60 text-brand-yellow rounded-2xl flex items-center justify-center mx-auto text-2xl mb-2">
+                            <i class="fa-solid fa-circle-check"></i>
+                        </div>
+                        <h4 class="font-extrabold text-lg">You're all caught up for today!</h4>
+                        <p class="text-xs text-brand-subtext max-w-md mx-auto leading-relaxed">${nextText}</p>
+                        <button onclick="switchTab('subjects')" class="mt-2 inline-flex items-center gap-2 px-4 py-2 bg-brand-yellow text-brand-black rounded-xl font-bold text-xs hover:bg-brand-yellowLight transition-all">
+                            <i class="fa-solid fa-plus"></i> Study a New Chapter
+                        </button>
+                    </div>
+                `;
+            } else {
+                listContainer.innerHTML = todaysTasks.map(task => `
+                    <div class="bg-gray-50 dark:bg-gray-800/70 p-5 rounded-2xl border border-gray-100 dark:border-gray-700/80 flex flex-col justify-between space-y-4 hover:border-brand-yellow/80 hover:shadow-md transition-all group">
+                        <div>
+                            <div class="flex items-center justify-between">
+                                <span class="text-[10px] font-extrabold uppercase tracking-wider bg-brand-yellow/20 text-amber-800 dark:text-brand-yellow px-2.5 py-0.5 rounded-md">
+                                    ${task.subject}
+                                </span>
+                                <span class="text-[10px] font-bold text-gray-500 dark:text-gray-400 bg-gray-200/60 dark:bg-gray-700 px-2 py-0.5 rounded-md">
+                                    R${task.revisionNumber}
+                                </span>
+                            </div>
+                            <h4 class="font-extrabold text-base mt-2.5 leading-snug group-hover:text-amber-500 transition-colors">${task.chapterName}</h4>
+                            <div class="text-xs text-brand-subtext font-semibold flex items-center gap-1.5 mt-1">
+                                <i class="fa-regular fa-calendar-check text-brand-yellow"></i> Scheduled for today
+                            </div>
+                        </div>
+                        <button onclick="openRevisionModal('${task.id}')" class="w-full py-2.5 bg-brand-yellow hover:bg-brand-yellowLight text-brand-black font-extrabold rounded-xl shadow-sm text-xs transition-colors flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-play text-xs"></i> Start Revision
+                        </button>
+                    </div>
+                `).join('');
+            }
+
+            // Stat Cards Calculation
+            const completedChaps = state.chapters.filter(c => c.status === 'Completed').length;
+            const completedRevs = state.revisions.filter(r => r.status === 'completed').length;
+            const pendingRevs = state.revisions.filter(r => r.status === 'pending').length;
+
+            document.getElementById('stat-completed-chapters').innerText = completedChaps;
+            document.getElementById('stat-completed-revisions').innerText = completedRevs;
+            document.getElementById('stat-pending-revisions').innerText = pendingRevs;
+            document.getElementById('stat-current-streak').innerText = state.streak;
+
+            // Subject Progress Matrix
+            const subGrid = document.getElementById('dashboard-subjects-grid');
+            subGrid.innerHTML = state.selectedSubjects.map(sub => {
+                const subChaps = state.chapters.filter(c => c.subject === sub);
+                const comp = subChaps.filter(c => c.status === 'Completed').length;
+                const studying = subChaps.filter(c => c.status === 'Currently Studying').length;
+                const total = subChaps.length;
+                const pct = total > 0 ? Math.round((comp / total) * 100) : 0;
+
+                return `
+                    <div onclick="openSubjectDetails('${sub}')" class="bg-white dark:bg-brand-darkCard p-5 rounded-2xl border border-gray-100 dark:border-gray-800 shadow-sm hover:border-brand-yellow hover:shadow-md cursor-pointer transition-all space-y-3 group">
+                        <div class="flex items-center justify-between">
+                            <h4 class="font-extrabold text-sm group-hover:text-amber-500 transition-colors flex items-center gap-2">
+                                <span class="w-2 h-2 rounded-full bg-brand-yellow"></span> ${sub}
+                            </h4>
+                            <span class="text-xs font-bold text-brand-yellow bg-brand-black px-2 py-0.5 rounded-lg">${pct}%</span>
+                        </div>
+                        <div class="text-xs text-brand-subtext font-semibold flex items-center justify-between">
+                            <span>${comp} of ${total} Chapters</span>
+                            ${studying > 0 ? `<span class="text-[10px] text-blue-500 font-bold">${studying} studying</span>` : ''}
+                        </div>
+                        <div class="w-full bg-gray-100 dark:bg-gray-800 h-2 rounded-full overflow-hidden">
+                            <div class="bg-brand-yellow h-2 rounded-full transition-all duration-300" style="width: ${pct}%"></div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            // Upcoming 7 Days List
+            const upcomingContainer = document.getElementById('upcoming-revisions-preview');
+            const next7Days = [];
+            for (let i = 1; i <= 7; i++) {
+                const d = new Date();
+                d.setDate(d.getDate() + i);
+                const dStr = d.toISOString().split('T')[0];
+                const count = state.revisions.filter(r => r.scheduledDate === dStr && r.status === 'pending').length;
+                next7Days.push({ dateStr: dStr, dayName: d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' }), count });
+            }
+
+            upcomingContainer.innerHTML = next7Days.map(item => `
+                <div class="flex items-center justify-between p-2.5 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors">
+                    <span class="text-xs font-bold text-gray-600 dark:text-gray-300">${item.dayName}</span>
+                    <span class="text-xs font-extrabold ${item.count > 0 ? 'bg-amber-100 dark:bg-amber-900/40 text-amber-800 dark:text-amber-300' : 'bg-gray-100 dark:bg-gray-800 text-gray-400'} px-2.5 py-1 rounded-full">
+                        ${item.count} ${item.count === 1 ? 'task' : 'tasks'}
+                    </span>
+                </div>
+            `).join('');
+        }
+
+        /* ==========================================================================
+           8. REVISION TASK MODAL & MEMORY RATING EXECUTION
+           ========================================================================== */
+        function openRevisionModal(taskId) {
+            const task = state.revisions.find(r => r.id === taskId);
+            if (!task) return;
+
+            state.activeRevisionTask = task;
+            document.getElementById('rev-modal-subject-pill').innerText = task.subject;
+            document.getElementById('rev-modal-chapter-title').innerText = task.chapterName;
+            document.getElementById('rev-modal-revision-tag').innerText = `Revision Milestone #${task.revisionNumber}`;
+
+            document.getElementById('rev-modal-step-1').classList.remove('hidden');
+            document.getElementById('rev-modal-step-2').classList.add('hidden');
+
+            document.getElementById('revision-modal').classList.remove('hidden');
+        }
+
+        function closeRevisionModal() {
+            document.getElementById('revision-modal').classList.add('hidden');
+            state.activeRevisionTask = null;
+        }
+
+        function proceedToMemoryRating() {
+            document.getElementById('rev-modal-step-1').classList.add('hidden');
+            document.getElementById('rev-modal-step-2').classList.remove('hidden');
+        }
+
+        function completeActiveRevision(rating) {
+            if (!state.activeRevisionTask) return;
+
+            const task = state.activeRevisionTask;
+            const todayStr = new Date().toISOString().split('T')[0];
+
+            // Update task status
+            task.status = 'completed';
+            task.rating = rating;
+            task.completedDate = todayStr;
+
+            // Update XP points
+            let xpEarned = 15;
+            if (rating === 'Easy') xpEarned = 10;
+            else if (rating === 'Difficult') xpEarned = 20;
+            state.xp += xpEarned;
+
+            // Adjust NEXT revision task
+            const nextRevNumber = task.revisionNumber + 1;
+            const nextRevTask = state.revisions.find(r => r.chapterId === task.chapterId && r.revisionNumber === nextRevNumber && r.status === 'pending');
+
+            if (nextRevTask) {
+                let baseInterval = REVISION_INTERVALS[nextRevNumber - 1] || 14;
+                if (rating === 'Easy') baseInterval = Math.round(baseInterval * 1.2);
+                else if (rating === 'Difficult') baseInterval = Math.max(1, Math.round(baseInterval * 0.7));
+
+                const newTarget = new Date();
+                newTarget.setDate(newTarget.getDate() + baseInterval);
+                nextRevTask.scheduledDate = newTarget.toISOString().split('T')[0];
+            }
+
+            // Streak Logic
+            if (state.lastStreakDate !== todayStr) {
+                const yesterday = new Date();
+                yesterday.setDate(yesterday.getDate() - 1);
+                const yesterdayStr = yesterday.toISOString().split('T')[0];
+
+                if (state.lastStreakDate === yesterdayStr) {
+                    state.streak += 1;
+                } else {
+                    state.streak = 1;
+                }
+                state.lastStreakDate = todayStr;
+                if (state.streak > state.longestStreak) state.longestStreak = state.streak;
+            }
+
+            checkAchievements();
+            playTone('success');
+            saveToLocalStorage();
+            closeRevisionModal();
+            renderAllTabs();
+            showToast(`Revision completed! +${xpEarned} XP earned.`);
+        }
+
+        /* ==========================================================================
+           9. SUBJECTS & CHAPTERS MANAGEMENT TAB
+           ========================================================================== */
+        function renderSubjectsTab() {
+            if (!state.activeSubjectTab && state.selectedSubjects.length > 0) {
+                state.activeSubjectTab = state.selectedSubjects[0];
+            }
+
+            // Render Subject Pills with completion fractions
+            const pillsContainer = document.getElementById('subject-tab-buttons');
+            pillsContainer.innerHTML = state.selectedSubjects.map(sub => {
+                const subChaps = state.chapters.filter(c => c.subject === sub);
+                const compCount = subChaps.filter(c => c.status === 'Completed').length;
+                const totalCount = subChaps.length;
+                const isAct = state.activeSubjectTab === sub;
+
+                return `
+                    <button onclick="setActiveSubjectTab('${sub}')" class="px-4 py-2.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all flex items-center gap-2 ${isAct ? 'bg-brand-yellow text-brand-black shadow-md ring-2 ring-brand-yellow/50' : 'bg-white dark:bg-brand-darkCard text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-gray-800 hover:text-brand-black dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-800/60'}">
+                        <span>${sub}</span>
+                        <span class="text-[10px] px-2 py-0.5 rounded-full ${isAct ? 'bg-brand-black text-brand-yellow' : 'bg-gray-100 dark:bg-gray-800 text-gray-500'} font-extrabold">${compCount}/${totalCount}</span>
+                    </button>
+                `;
+            }).join('');
+
+            renderChapters();
+        }
+
+        function setActiveSubjectTab(sub) {
+            playTone('click');
+            state.activeSubjectTab = sub;
+            renderSubjectsTab();
+        }
+
+        function renderChapters() {
+            const sub = state.activeSubjectTab;
+            if (!sub) return;
+
+            const searchQuery = (document.getElementById('chapter-search-input').value || '').toLowerCase();
+            const statusFilter = document.getElementById('chapter-status-filter').value;
+
+            const subChaps = state.chapters.filter(c => c.subject === sub);
+            const compCount = subChaps.filter(c => c.status === 'Completed').length;
+            const pct = subChaps.length > 0 ? Math.round((compCount / subChaps.length) * 100) : 0;
+
+            document.getElementById('active-subject-title').innerText = sub;
+            document.getElementById('active-subject-subtitle').innerText = `${compCount} of ${subChaps.length} Chapters Completed (${pct}%)`;
+            document.getElementById('active-subject-progress-bar').style.width = `${pct}%`;
+
+            let filtered = subChaps.filter(c => c.name.toLowerCase().includes(searchQuery));
+            if (statusFilter !== 'ALL') {
+                filtered = filtered.filter(c => c.status === statusFilter);
+            }
+
+            const container = document.getElementById('chapters-list-container');
+            if (filtered.length === 0) {
+                container.innerHTML = `
+                    <div class="col-span-full py-16 text-center text-gray-400 bg-white dark:bg-brand-darkCard rounded-3xl border border-dashed border-gray-200 dark:border-gray-800">
+                        <i class="fa-solid fa-book-open-reader text-4xl mb-3 text-gray-300 dark:text-gray-600"></i>
+                        <p class="text-sm font-semibold">No chapters match this search or filter.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = filtered.map((ch, idx) => {
+                let badgeStyle = 'bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-300';
+                if (ch.status === 'Currently Studying') badgeStyle = 'bg-blue-100 text-blue-700 dark:bg-blue-950 dark:text-blue-300';
+                else if (ch.status === 'Completed') badgeStyle = 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300';
+
+                // Revision info tag
+                let revInfoHtml = '';
+                if (ch.status === 'Completed') {
+                    const chRevs = state.revisions.filter(r => r.chapterId === ch.id);
+                    const doneRevs = chRevs.filter(r => r.status === 'completed').length;
+                    const nextPending = chRevs.find(r => r.status === 'pending');
+                    if (nextPending) {
+                        revInfoHtml = `<span class="text-[10px] text-brand-subtext font-semibold flex items-center gap-1"><i class="fa-regular fa-clock text-brand-yellow"></i> R${nextPending.revisionNumber}: ${nextPending.scheduledDate}</span>`;
+                    } else if (doneRevs > 0) {
+                        revInfoHtml = `<span class="text-[10px] text-emerald-600 font-semibold flex items-center gap-1"><i class="fa-solid fa-check-double"></i> All ${doneRevs} revs done</span>`;
+                    }
+                }
+
+                return `
+                    <div class="bg-white dark:bg-brand-darkCard p-4 md:p-5 rounded-2xl border border-gray-100 dark:border-gray-800 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:border-brand-yellow/60 hover:shadow-md transition-all group">
+                        <div class="flex items-center gap-3.5 min-w-0">
+                            <span class="w-8 h-8 rounded-xl bg-gray-100 dark:bg-gray-800 text-xs font-extrabold flex items-center justify-center text-gray-500 dark:text-gray-400 flex-shrink-0 group-hover:bg-brand-yellow group-hover:text-brand-black transition-colors">
+                                ${String(ch.chapterNumber || idx + 1).padStart(2, '0')}
+                            </span>
+                            <div class="min-w-0">
+                                <h4 class="font-extrabold text-sm truncate" title="${ch.name}">${ch.name}</h4>
+                                <div class="flex items-center gap-2 mt-1">
+                                    <span class="text-[10px] font-bold px-2 py-0.5 rounded-md inline-block ${badgeStyle}">
+                                        ${ch.status}
+                                    </span>
+                                    ${revInfoHtml}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Status Selector & Action Buttons -->
+                        <div class="flex items-center gap-2 self-end sm:self-auto flex-shrink-0">
+                            <select onchange="updateChapterStatus('${ch.id}', this.value)" class="px-3 py-1.5 rounded-xl bg-gray-50 dark:bg-gray-800 text-xs font-bold border border-gray-200 dark:border-gray-700 focus:outline-none focus:ring-1 focus:ring-brand-yellow cursor-pointer">
+                                <option value="Not Started" ${ch.status === 'Not Started' ? 'selected' : ''}>Not Started</option>
+                                <option value="Currently Studying" ${ch.status === 'Currently Studying' ? 'selected' : ''}>Currently Studying</option>
+                                <option value="Completed" ${ch.status === 'Completed' ? 'selected' : ''}>Completed</option>
+                            </select>
+                            <button onclick="deleteCustomChapter('${ch.id}')" class="p-2 text-gray-400 hover:text-red-500 rounded-lg hover:bg-red-50 dark:hover:bg-red-950/30 text-xs transition-colors" title="Delete Chapter">
+                                <i class="fa-solid fa-trash-can"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function updateChapterStatus(chapterId, newStatus) {
+            const ch = state.chapters.find(c => c.id === chapterId);
+            if (!ch) return;
+
+            if (ch.status === 'Completed' && newStatus !== 'Completed') {
+                if (!confirm("Changing status away from Completed will stop scheduled pending revision tasks. Continue?")) {
+                    renderChapters();
+                    return;
+                }
+            }
+
+            ch.status = newStatus;
+            if (newStatus === 'Completed') {
+                ch.completedDate = new Date().toISOString().split('T')[0];
+                generateDefaultRevisionsForChapter(ch);
+                showToast(`🎉 "${ch.name}" marked Completed! 5 revision milestones generated.`);
+            }
+
+            playTone('click');
+            saveToLocalStorage();
+            renderAllTabs();
+        }
+
+        function openSubjectDetails(sub) {
+            state.activeSubjectTab = sub;
+            switchTab('subjects');
+        }
+
+        /* Custom Chapter / Subject Modals */
+        function openAddChapterModal() {
+            const select = document.getElementById('modal-chapter-subject-select');
+            select.innerHTML = state.selectedSubjects.map(s => `<option value="${s}" ${s === state.activeSubjectTab ? 'selected' : ''}>${s}</option>`).join('');
+            document.getElementById('add-chapter-modal').classList.remove('hidden');
+            setTimeout(() => {
+                const inp = document.getElementById('modal-chapter-name-input');
+                if (inp) inp.focus();
+            }, 50);
+        }
+        function closeAddChapterModal() {
+            document.getElementById('add-chapter-modal').classList.add('hidden');
+        }
+        function saveCustomChapter() {
+            const sub = document.getElementById('modal-chapter-subject-select').value;
+            const name = document.getElementById('modal-chapter-name-input').value.trim();
+            if (!name) return;
+
+            const existingCount = state.chapters.filter(c => c.subject === sub).length;
+            state.chapters.push({
+                id: 'ch_cust_' + Math.random().toString(36).substr(2, 9),
+                class: state.selectedClass,
+                subject: sub,
+                name: name,
+                chapterNumber: existingCount + 1,
+                status: 'Not Started',
+                completedDate: null
+            });
+
+            saveToLocalStorage();
+            closeAddChapterModal();
+            renderAllTabs();
+            showToast(`Custom chapter "${name}" added.`);
+            document.getElementById('modal-chapter-name-input').value = '';
+        }
+
+        function deleteCustomChapter(chapterId) {
+            if (!confirm('Are you sure you want to delete this chapter?')) return;
+            state.chapters = state.chapters.filter(c => c.id !== chapterId);
+            state.revisions = state.revisions.filter(r => r.chapterId !== chapterId);
+            saveToLocalStorage();
+            renderAllTabs();
+            showToast('Chapter deleted.');
+        }
+
+        function openAddSubjectModal() {
+            document.getElementById('add-subject-modal').classList.remove('hidden');
+            setTimeout(() => {
+                const inp = document.getElementById('modal-subject-name-input');
+                if (inp) inp.focus();
+            }, 50);
+        }
+        function closeAddSubjectModal() {
+            document.getElementById('add-subject-modal').classList.add('hidden');
+        }
+        function saveCustomSubject() {
+            const name = document.getElementById('modal-subject-name-input').value.trim();
+            if (!name) return;
+
+            if (!state.selectedSubjects.includes(name)) {
+                state.selectedSubjects.push(name);
+                state.activeSubjectTab = name;
+            }
+
+            saveToLocalStorage();
+            closeAddSubjectModal();
+            renderAllTabs();
+            showToast(`New subject "${name}" added.`);
+            document.getElementById('modal-subject-name-input').value = '';
+        }
+
+        /* ==========================================================================
+           10. INTERACTIVE REVISION CALENDAR TAB
+           ========================================================================== */
+        function setCalendarView(view) {
+            playTone('click');
+            state.calendarView = view;
+
+            ['month', 'week', 'day'].forEach(v => {
+                const btn = document.getElementById(`cal-view-${v}`);
+                if (v === view) {
+                    btn.classList.add('bg-white', 'dark:bg-brand-darkCard', 'text-brand-black', 'dark:text-white', 'shadow-sm');
+                    btn.classList.remove('text-gray-500');
+                } else {
+                    btn.classList.remove('bg-white', 'dark:bg-brand-darkCard', 'text-brand-black', 'dark:text-white', 'shadow-sm');
+                    btn.classList.add('text-gray-500');
+                }
+            });
+
+            renderCalendar();
+        }
+
+        function navigateCalendar(dir) {
+            playTone('click');
+            const d = new Date(state.calendarDate);
+            if (state.calendarView === 'month') {
+                d.setMonth(d.getMonth() + dir);
+            } else if (state.calendarView === 'week') {
+                d.setDate(d.getDate() + (dir * 7));
+            } else {
+                d.setDate(d.getDate() + dir);
+            }
+            state.calendarDate = d;
+            renderCalendar();
+        }
+
+        function goToCalendarToday() {
+            state.calendarDate = new Date();
+            renderCalendar();
+        }
+
+        function renderCalendar() {
+            const container = document.getElementById('calendar-render-area');
+            const d = state.calendarDate;
+
+            if (state.calendarView === 'month') {
+                renderMonthView(container, d);
+            } else if (state.calendarView === 'week') {
+                renderWeekView(container, d);
+            } else {
+                renderDayView(container, d);
+            }
+        }
+
+        function renderMonthView(container, date) {
+            const year = date.getFullYear();
+            const month = date.getMonth();
+
+            const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+            document.getElementById('calendar-title').innerText = `${monthNames[month]} ${year}`;
+
+            const firstDay = new Date(year, month, 1).getDay();
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+            const todayStr = new Date().toISOString().split('T')[0];
+
+            let html = `
+                <div class="grid grid-cols-7 gap-2 text-center font-bold text-xs text-gray-400 mb-2">
+                    <div>Sun</div><div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div>
+                </div>
+                <div class="grid grid-cols-7 gap-1.5 md:gap-2.5">
+            `;
+
+            // Empty slots
+            for (let i = 0; i < firstDay; i++) {
+                html += `<div class="min-h-[70px] md:min-h-[110px] xl:min-h-[120px] bg-gray-50/50 dark:bg-gray-800/20 rounded-2xl"></div>`;
+            }
+
+            // Month days
+            for (let day = 1; day <= daysInMonth; day++) {
+                const currentStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                const dayTasks = state.revisions.filter(r => r.scheduledDate === currentStr && r.status === 'pending');
+                const compTasks = state.revisions.filter(r => r.scheduledDate === currentStr && r.status === 'completed');
+
+                const isToday = currentStr === todayStr;
+
+                html += `
+                    <div onclick="selectCalendarDate('${currentStr}')" class="min-h-[70px] md:min-h-[110px] xl:min-h-[120px] p-2 md:p-2.5 rounded-2xl border ${isToday ? 'border-brand-yellow ring-2 ring-brand-yellow/30 bg-amber-50/30 dark:bg-amber-950/20' : 'border-gray-100 dark:border-gray-800 bg-white dark:bg-brand-darkCard'} flex flex-col justify-between hover:border-brand-yellow hover:shadow-md cursor-pointer transition-all">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs font-extrabold ${isToday ? 'bg-brand-yellow text-brand-black w-5 h-5 rounded-full flex items-center justify-center shadow-xs' : 'text-gray-700 dark:text-gray-300'}">${day}</span>
+                            ${dayTasks.length > 0 ? `<span class="w-2 h-2 rounded-full bg-brand-yellow"></span>` : ''}
+                        </div>
+                        <div class="space-y-1">
+                            ${dayTasks.slice(0, 2).map(t => `
+                                <div class="text-[9px] font-bold bg-amber-100 dark:bg-amber-900/60 text-amber-900 dark:text-amber-200 rounded px-1.5 py-0.5 truncate flex items-center gap-1" title="${t.subject}: ${t.chapterName} (R${t.revisionNumber})">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-brand-yellow flex-shrink-0"></span>
+                                    <span class="truncate">${t.chapterName}</span>
+                                </div>
+                            `).join('')}
+                            ${dayTasks.length > 2 ? `<div class="text-[9px] font-bold text-gray-500 pl-1">+${dayTasks.length - 2} more</div>` : ''}
+                            ${compTasks.length > 0 ? `<div class="text-[9px] font-bold bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 rounded px-1.5 py-0.5 truncate flex items-center gap-1"><i class="fa-solid fa-check text-[8px]"></i> ${compTasks.length} done</div>` : ''}
+                        </div>
+                    </div>
+                `;
+            }
+
+            html += `</div>`;
+            container.innerHTML = html;
+        }
+
+        function renderWeekView(container, date) {
+            const startOfWeek = new Date(date);
+            startOfWeek.setDate(date.getDate() - date.getDay());
+            const todayStr = new Date().toISOString().split('T')[0];
+
+            document.getElementById('calendar-title').innerText = `Week of ${startOfWeek.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`;
+
+            let html = `<div class="grid grid-cols-1 md:grid-cols-7 gap-3">`;
+
+            for (let i = 0; i < 7; i++) {
+                const cur = new Date(startOfWeek);
+                cur.setDate(startOfWeek.getDate() + i);
+                const curStr = cur.toISOString().split('T')[0];
+                const tasks = state.revisions.filter(r => r.scheduledDate === curStr);
+                const isToday = curStr === todayStr;
+
+                html += `
+                    <div class="bg-gray-50 dark:bg-gray-800/40 p-3.5 rounded-2xl border ${isToday ? 'border-brand-yellow ring-2 ring-brand-yellow/30' : 'border-gray-100 dark:border-gray-800'} space-y-2.5">
+                        <div class="flex items-center justify-between border-b border-gray-200 dark:border-gray-700 pb-2">
+                            <span class="text-xs font-bold">${cur.toLocaleDateString('en-US', { weekday: 'short', day: 'numeric' })}</span>
+                            <span class="text-[10px] font-bold text-gray-400">${tasks.length} tasks</span>
+                        </div>
+                        <div class="space-y-1.5 max-h-64 overflow-y-auto">
+                            ${tasks.length === 0 ? `<p class="text-[10px] text-gray-400 py-4 text-center">No revisions</p>` : ''}
+                            ${tasks.map(t => `
+                                <div onclick="openRevisionModal('${t.id}')" class="p-2 rounded-xl text-[10px] font-semibold cursor-pointer hover:shadow-xs transition-all ${t.status === 'completed' ? 'bg-emerald-100 dark:bg-emerald-950 text-emerald-800' : 'bg-white dark:bg-brand-darkCard border border-gray-200 dark:border-gray-700 hover:border-brand-yellow'}">
+                                    <div class="font-bold truncate">${t.chapterName}</div>
+                                    <div class="text-[9px] text-gray-400">R${t.revisionNumber} · ${t.subject}</div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            }
+
+            html += `</div>`;
+            container.innerHTML = html;
+        }
+
+        function renderDayView(container, date) {
+            const curStr = date.toISOString().split('T')[0];
+            document.getElementById('calendar-title').innerText = date.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
+
+            const tasks = state.revisions.filter(r => r.scheduledDate === curStr);
+
+            if (tasks.length === 0) {
+                container.innerHTML = `
+                    <div class="py-16 text-center text-gray-400">
+                        <i class="fa-solid fa-calendar-check text-5xl mb-3 text-gray-300 dark:text-gray-600"></i>
+                        <p class="text-base font-semibold">No revisions scheduled for this date.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = `
+                <div class="space-y-3 max-w-2xl mx-auto">
+                    ${tasks.map(t => `
+                        <div class="p-4 md:p-5 rounded-2xl bg-gray-50 dark:bg-gray-800/60 border border-gray-100 dark:border-gray-700 flex items-center justify-between gap-4">
+                            <div>
+                                <span class="text-[10px] font-bold text-amber-800 dark:text-amber-300 uppercase">${t.subject}</span>
+                                <h4 class="font-extrabold text-sm md:text-base mt-0.5">${t.chapterName}</h4>
+                                <span class="text-xs text-brand-subtext font-semibold">Revision Milestone #${t.revisionNumber}</span>
+                            </div>
+                            ${t.status === 'pending' ? `
+                                <button onclick="openRevisionModal('${t.id}')" class="px-4 py-2 bg-brand-yellow text-brand-black text-xs font-bold rounded-xl shadow-sm hover:bg-brand-yellowLight transition-all">
+                                    Start Revision
+                                </button>
+                            ` : `
+                                <span class="text-xs font-bold text-emerald-600 bg-emerald-100 dark:bg-emerald-950 px-3 py-1.5 rounded-xl">Completed (${t.rating || 'Done'})</span>
+                            `}
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        }
+
+        function selectCalendarDate(dateStr) {
+            state.calendarDate = new Date(dateStr);
+            setCalendarView('day');
+        }
+
+        /* ==========================================================================
+           11. ANALYTICS & GAMIFICATION BADGES
+           ========================================================================== */
+        const ACHIEVEMENTS_LIST = [
+            { id: 'first_rev', title: 'First Milestone', desc: 'Complete 1 revision task', icon: 'fa-star' },
+            { id: 'streak_5', title: '5-Day Streak', desc: 'Maintain study streak for 5 days', icon: 'fa-fire' },
+            { id: 'chaps_10', title: '10 Chapters Done', desc: 'Complete 10 syllabus chapters', icon: 'fa-book-bookmark' },
+            { id: 'revs_50', title: 'Revision Master', desc: 'Complete 50 total revisions', icon: 'fa-crown' },
+            { id: 'xp_500', title: 'XP Titan', desc: 'Earn 500 total XP', icon: 'fa-bolt' }
+        ];
+
+        function checkAchievements() {
+            const compChaps = state.chapters.filter(c => c.status === 'Completed').length;
+            const compRevs = state.revisions.filter(r => r.status === 'completed').length;
+
+            const newUnlocked = [];
+
+            if (compRevs >= 1 && !state.achievements.includes('first_rev')) newUnlocked.push('first_rev');
+            if (state.streak >= 5 && !state.achievements.includes('streak_5')) newUnlocked.push('streak_5');
+            if (compChaps >= 10 && !state.achievements.includes('chaps_10')) newUnlocked.push('chaps_10');
+            if (compRevs >= 50 && !state.achievements.includes('revs_50')) newUnlocked.push('revs_50');
+            if (state.xp >= 500 && !state.achievements.includes('xp_500')) newUnlocked.push('xp_500');
+
+            if (newUnlocked.length > 0) {
+                state.achievements.push(...newUnlocked);
+                playTone('badge');
+                showToast(`🏆 New Achievement Unlocked!`);
+            }
+        }
+
+        function renderAnalytics() {
+            const compChaps = state.chapters.filter(c => c.status === 'Completed').length;
+            const totalChaps = state.chapters.length;
+            const pct = totalChaps > 0 ? Math.round((compChaps / totalChaps) * 100) : 0;
+
+            document.getElementById('analytics-completion-rate').innerText = `${pct}%`;
+            document.getElementById('analytics-total-xp').innerText = `${state.xp} XP`;
+            document.getElementById('analytics-current-streak').innerText = `${state.streak} Days`;
+            document.getElementById('analytics-longest-streak').innerText = `${state.longestStreak} Days`;
+
+            // Render Weekly Activity Bar Chart
+            const chartBars = document.getElementById('weekly-chart-bars');
+            const past7 = [];
+            for (let i = 6; i >= 0; i--) {
+                const d = new Date();
+                d.setDate(d.getDate() - i);
+                const dStr = d.toISOString().split('T')[0];
+                const count = state.revisions.filter(r => r.completedDate === dStr && r.status === 'completed').length;
+                past7.push({ day: d.toLocaleDateString('en-US', { weekday: 'short' }), count });
+            }
+
+            const maxCount = Math.max(...past7.map(p => p.count), 4);
+            chartBars.innerHTML = past7.map(p => {
+                const heightPct = Math.round((p.count / maxCount) * 100);
+                return `
+                    <div class="flex-1 flex flex-col items-center gap-2 h-full justify-end group">
+                        <span class="text-[10px] font-bold text-gray-500 opacity-0 group-hover:opacity-100 transition-opacity">${p.count}</span>
+                        <div class="w-full max-w-[36px] bg-brand-yellow rounded-t-xl transition-all duration-300 group-hover:bg-brand-yellowLight shadow-sm" style="height: ${Math.max(10, heightPct)}%"></div>
+                        <span class="text-[10px] font-extrabold text-gray-400">${p.day}</span>
+                    </div>
+                `;
+            }).join('');
+
+            // Subject Comparisons
+            const subList = document.getElementById('subject-breakdown-list');
+            subList.innerHTML = state.selectedSubjects.map(sub => {
+                const subChaps = state.chapters.filter(c => c.subject === sub);
+                const done = subChaps.filter(c => c.status === 'Completed').length;
+                const total = subChaps.length;
+                const subPct = total > 0 ? Math.round((done / total) * 100) : 0;
+
+                return `
+                    <div class="space-y-1.5">
+                        <div class="flex items-center justify-between text-xs font-bold">
+                            <span>${sub}</span>
+                            <span class="text-brand-subtext">${done}/${total} (${subPct}%)</span>
+                        </div>
+                        <div class="w-full bg-gray-100 dark:bg-gray-800 h-2.5 rounded-full overflow-hidden">
+                            <div class="bg-brand-yellow h-2.5 rounded-full transition-all duration-300" style="width: ${subPct}%"></div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            // Render Badges Grid
+            const badgesGrid = document.getElementById('badges-grid');
+            badgesGrid.innerHTML = ACHIEVEMENTS_LIST.map(b => {
+                const isUnlocked = state.achievements.includes(b.id);
+                return `
+                    <div class="p-5 rounded-2xl border text-center space-y-2.5 transition-all ${isUnlocked ? 'bg-amber-50/50 dark:bg-amber-950/20 border-brand-yellow ring-2 ring-brand-yellow/30' : 'bg-gray-50 dark:bg-gray-800/30 border-gray-200 dark:border-gray-800 opacity-60'}">
+                        <div class="w-12 h-12 rounded-2xl mx-auto flex items-center justify-center text-xl shadow-xs ${isUnlocked ? 'bg-brand-yellow text-brand-black' : 'bg-gray-200 dark:bg-gray-700 text-gray-400'}">
+                            <i class="fa-solid ${b.icon}"></i>
+                        </div>
+                        <div>
+                            <div class="font-extrabold text-xs text-brand-black dark:text-white">${b.title}</div>
+                            <div class="text-[10px] text-gray-400 leading-tight mt-1">${b.desc}</div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        /* ==========================================================================
+           12. SETTINGS & DATA BACKUP MANAGEMENT
+           ========================================================================== */
+        function renderSettings() {
+            document.getElementById('setting-sound-toggle').checked = state.settings.soundEnabled;
+            document.getElementById('daily-limit-slider').value = state.settings.dailyLimit;
+            document.getElementById('daily-limit-val').innerText = state.settings.dailyLimit;
+        }
+
+        function toggleSoundSetting(enabled) {
+            state.settings.soundEnabled = enabled;
+            saveToLocalStorage();
+            updateDesktopSoundUI();
+        }
+
+        function updateDailyLimit(val) {
+            state.settings.dailyLimit = parseInt(val);
+            document.getElementById('daily-limit-val').innerText = val;
+            checkAndRebalanceMissedRevisions();
+            saveToLocalStorage();
+        }
+
+        function toggleDarkMode() {
+            state.settings.darkMode = !state.settings.darkMode;
+            applyTheme();
+            saveToLocalStorage();
+        }
+
+        function applyTheme() {
+            if (state.settings.darkMode) {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+            }
+        }
+
+        function exportBackupData() {
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(state, null, 2));
+            const dlAnchor = document.createElement('a');
+            dlAnchor.setAttribute("href", dataStr);
+            dlAnchor.setAttribute("download", `study_guy_cbse_backup_${new Date().toISOString().split('T')[0]}.json`);
+            document.body.appendChild(dlAnchor);
+            dlAnchor.click();
+            dlAnchor.remove();
+            showToast('Backup JSON exported successfully!');
+        }
+
+        function importBackupData(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const imported = JSON.parse(e.target.result);
+                    if (imported && imported.chapters) {
+                        state = { ...state, ...imported };
+                        saveToLocalStorage();
+                        applyTheme();
+                        renderAllTabs();
+                        showToast('Backup restored successfully!');
+                    } else {
+                        alert('Invalid backup JSON format.');
+                    }
+                } catch(err) {
+                    alert('Error parsing JSON backup file.');
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        function confirmResetAllData() {
+            if (confirm("Are you sure you want to reset all Study Guy data? All chapter progress, revision schedules, and achievements will be lost.")) {
+                if (confirm("FINAL WARNING: This action cannot be undone.")) {
+                    localStorage.removeItem('study_guy_state');
+                    localStorage.removeItem('study_guy_configured');
+                    location.reload();
+                }
+            }
+        }
+
+        /* ==========================================================================
+           13. UTILITY TOAST NOTIFICATIONS
+           ========================================================================== */
+        function showToast(msg) {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = 'bg-brand-black text-white dark:bg-brand-yellow dark:text-brand-black px-4 py-3 rounded-2xl shadow-2xl font-bold text-xs flex items-center gap-2.5 animate-fade-in pointer-events-auto border border-gray-800';
+            toast.innerHTML = `<i class="fa-solid fa-circle-check text-brand-yellow dark:text-brand-black"></i> <span>${msg}</span>`;
+
+            container.appendChild(toast);
+            setTimeout(() => {
+                toast.remove();
+            }, 3200);
+        }
+    </script>
+</body>
+</html>
